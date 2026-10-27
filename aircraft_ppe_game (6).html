@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>適航大進擊：飛機維修個人防護裝備(PPE)互動訓練系統</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #0284c7;
+            --accent-color: #10b981;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Microsoft JhengHei";
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 40px 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            background-color: #cbd5e1;
+            color: #475569;
+            transition: transform 0.2s, background-color 0.3s, color 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            background-color: #94a3b8;
+            color: white;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ppe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 25px;
+        }
+
+        .ppe-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-top: 6px solid var(--secondary-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ppe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .ppe-image-container {
+            width: 100%;
+            height: 160px;
+            background-color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .ppe-icon-svg {
+            width: 80px;
+            height: 80px;
+            fill: var(--secondary-color);
+        }
+
+        .ppe-image-container { position: relative; }
+        .ppe-photo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            background: #fff;
+            transform-origin: center;
+        }
+
+        .card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .ppe-title {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
+            padding-right: 10px;
+        }
+
+        .audio-btn {
+            background-color: #f1f5f9;
+            color: var(--secondary-color);
+            border: 2px solid #e2e8f0;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            font-size: 20px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .audio-btn:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .card-body p {
+            margin: 10px 0;
+            font-size: 0.95rem;
+        }
+
+        .card-body strong {
+            color: #334155;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .voice-selector-container {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: #e2e8f0;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+            position: relative;
+            max-width: 92%;
+            box-sizing: border-box;
+        }
+
+        .voice-selector-container select {
+            max-width: 100%;
+            padding: 6px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .wo-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .wo-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 25px;
+            border-left: 6px solid var(--primary-color);
+        }
+
+        .wo-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .wo-id {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            background-color: #eff6ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .wo-listen-btn {
+            background-color: #eff6ff;
+            color: var(--primary-color);
+            border: 1px solid #bfdbfe;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .wo-listen-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .wo-question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #cbd5e1;
+        }
+
+        .action-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .ans-toggle-btn {
+            background-color: #475569;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .ans-toggle-btn:hover {
+            background-color: #1e293b;
+        }
+
+        .ans-box {
+            display: none;
+            width: 100%;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f0fdf4;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .ans-box strong {
+            color: var(--accent-color);
+            font-size: 1.05rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* ===== 平板語音 ===== */
+        .wo-listen-btn { min-height: 44px; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        .voice-test-btn {
+            margin-left: 8px;
+            padding: 8px 14px;
+            min-height: 40px;
+            border: 1px solid #94a3b8;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .voice-hint { margin-top: 6px; font-size: 12px; color: var(--text-muted); }
+
+        /* ===== 編輯功能 ===== */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 0 24px 0;
+        }
+        .tool-btn {
+            padding: 9px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            background: #fff;
+            color: var(--text-main);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .tool-btn:hover { background: #e2e8f0; }
+        .tool-btn.primary { background: var(--primary-color); border-color: var(--primary-color); color: #fff; }
+        .tool-btn.primary:hover { background: #172e6e; }
+        .tool-btn.danger { color: #b91c1c; border-color: #fca5a5; }
+        .edit-only { display: none !important; }
+        body.editing .edit-only { display: inline-block !important; }
+        body.editing .card-tools.edit-only { display: flex !important; }
+        .card-tools {
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed #cbd5e1;
+        }
+        .card-tools button {
+            padding: 5px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .card-tools button:hover { background: #e2e8f0; }
+        .card-tools button.danger { color: #b91c1c; border-color: #fca5a5; }
+        .card-tools button.danger:hover { background: #fee2e2; }
+        .ans-text { white-space: pre-line; }
+        .empty-hint { text-align: center; color: var(--text-muted); padding: 40px 0; grid-column: 1 / -1; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(15, 23, 42, 0.55);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 22px 24px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        .modal h3 { margin: 0 0 14px 0; color: var(--primary-color); }
+        .modal label { display: block; margin: 12px 0 4px; font-weight: 600; font-size: 14px; }
+        .modal input[type="text"], .modal textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .modal textarea { min-height: 70px; resize: vertical; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+        .photo-box {
+            position: relative;
+            aspect-ratio: 9 / 4;
+            touch-action: none;
+            user-select: none;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: var(--text-muted);
+            font-size: 14px;
+            background: #f8fafc;
+        }
+        .photo-box.has-photo { cursor: grab; }
+        .photo-box.has-photo:active { cursor: grabbing; }
+        .photo-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #fff; pointer-events: none; transform-origin: center; }
+        .modal select { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: #fff; }
+        .modal input[type="range"] { width: 100%; }
+        #view-controls .tool-btn { margin-top: 10px; }
+        .photo-actions { display: flex; gap: 8px; margin-top: 8px; }
+        #confirm-msg { white-space: pre-line; margin: 0; line-height: 1.7; }
+
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(20px);
+            background: #0f172a;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 14px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s;
+            z-index: 3000;
+            max-width: 90vw;
+        }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        #toast.bad { background: #b91c1c; }
+
+        /* ===== 句子語音 / 例句 / 工單中文 ===== */
+        .mini-audio {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            min-height: 36px;
+            margin-left: 4px;
+            padding: 0 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 18px;
+            background: #fff;
+            font-size: 15px;
+            cursor: pointer;
+            vertical-align: middle;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mini-audio:hover { background: #e2e8f0; }
+        .ex-box {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: #eff6ff;
+            border-left: 3px solid var(--primary-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        .ex-box strong { color: var(--primary-color); display: block; }
+        .ex-en { font-style: italic; color: #0f172a; margin-top: 4px; }
+        .ex-zh { color: var(--text-muted); font-size: 0.9rem; margin-top: 2px; }
+        .wo-btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+        .wo-zh-btn {
+            min-height: 44px;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            background: #0f766e;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .wo-zh-btn:hover { background: #115e59; }
+        .wo-zh {
+            display: none;
+            margin: -8px 0 18px 0;
+            padding: 12px 15px;
+            background: #f0fdfa;
+            border-left: 3px solid #0f766e;
+            border-radius: 8px;
+            color: #134e4a;
+            line-height: 1.7;
+        }
+        .wo-zh b { display: block; margin-bottom: 4px; }
+
+        /* ===== 遊戲 ===== */
+        .game-settings { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; margin-bottom: 20px; font-size: 15px; }
+        .game-settings select { padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 15px; }
+        .mode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+        .mode-card {
+            text-align: left;
+            padding: 20px;
+            border: none;
+            border-radius: 14px;
+            background: var(--card-bg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.07);
+            border-top: 6px solid var(--secondary-color);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            touch-action: manipulation;
+        }
+        .mode-card:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(0,0,0,0.12); }
+        .mode-card:disabled { opacity: 0.55; cursor: not-allowed; }
+        .mode-icon { font-size: 34px; }
+        .mode-name { font-size: 1.2rem; font-weight: 700; color: var(--primary-color); margin: 6px 0; }
+        .mode-desc { color: var(--text-muted); font-size: 0.92rem; min-height: 40px; }
+        .mode-best { margin-top: 10px; font-size: 0.85rem; color: #b45309; font-weight: 600; }
+        .game-tip { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 22px; }
+
+        .g-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-weight: 600; margin-bottom: 8px; }
+        .g-quit { padding: 6px 14px; border: 1px solid #cbd5e1; border-radius: 16px; background: #fff; cursor: pointer; }
+        .g-timer { height: 10px; background: #e2e8f0; border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
+        #g-timer-fill { height: 100%; width: 100%; background: #16a34a; transition: width 0.1s linear, background 0.3s; }
+        #g-timer-fill.low { background: #dc2626; }
+        .g-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.07);
+            padding: 22px;
+            max-width: 760px;
+            margin: 0 auto;
+            border-top: 6px solid var(--primary-color);
+        }
+        .g-media { max-width: 360px; margin: 0 auto 14px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .g-ask { text-align: center; font-weight: 600; margin: 12px 0 16px; color: #334155; }
+        .g-text { font-size: 1.15rem; line-height: 1.7; text-align: center; margin: 8px 0; color: #0f172a; }
+        .g-wo-title { text-align: center; font-weight: 700; color: var(--primary-color); margin-bottom: 4px; }
+        .g-big-audio { display: block; margin: 8px auto; width: 96px; height: 96px; border-radius: 50%; border: none; background: var(--primary-color); color: #fff; font-size: 40px; cursor: pointer; box-shadow: 0 4px 10px rgba(30,58,138,0.35); touch-action: manipulation; }
+        .g-hint-btn { display: block; margin: 8px auto; padding: 6px 14px; border: 1px solid #cbd5e1; border-radius: 16px; background: #fff; cursor: pointer; }
+        .g-hint { text-align: center; color: #0f766e; background: #f0fdfa; padding: 8px 12px; border-radius: 8px; margin: 6px 0; }
+        .g-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .game-opt {
+            padding: 14px 12px;
+            min-height: 56px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            background: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #0f172a;
+            touch-action: manipulation;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .game-opt:hover:not(:disabled) { background: #eff6ff; border-color: var(--primary-color); }
+        .game-opt.selected { background: #dbeafe; border-color: var(--primary-color); }
+        .game-opt.correct { background: #dcfce7; border-color: #16a34a; }
+        .game-opt.wrong { background: #fee2e2; border-color: #dc2626; }
+        .game-opt:disabled { cursor: default; }
+        .g-options.multi { grid-template-columns: 1fr; }
+        .g-submit { display: block; margin: 16px auto 0; }
+        .fb { margin-top: 18px; padding: 10px 14px; border-radius: 8px; font-weight: 700; text-align: center; }
+        .fb.ok { background: #dcfce7; color: #166534; }
+        .fb.bad { background: #fee2e2; color: #991b1b; }
+        .fb-info { margin-top: 12px; padding: 12px 14px; background: #f8fafc; border-radius: 8px; line-height: 1.7; font-size: 0.95rem; }
+        .fb-ex { margin-top: 6px; font-style: italic; }
+        .g-next { display: block; margin: 16px auto 0; }
+        .result { text-align: center; }
+        .stars { font-size: 36px; letter-spacing: 6px; }
+        .result-score { font-size: 3rem; font-weight: 800; color: var(--primary-color); }
+        .new-best { color: #b45309; font-weight: 700; margin: 4px 0; }
+        .wrong-box { text-align: left; margin: 16px 0; padding: 12px 16px; background: #fff7ed; border-radius: 8px; font-size: 0.92rem; }
+        .wrong-box ul { margin: 6px 0 0 18px; padding: 0; }
+        .result-actions { display: flex; justify-content: center; gap: 12px; margin-top: 12px; }
+        @media (max-width: 560px) { .g-options { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>適航大進擊：飛機維修個人防護裝備(PPE)互動訓練系統</h1>
+        <p>Airworthiness Rush: Interactive Aircraft Maintenance PPE Training WebApp</p>
+    </header>
+
+    <div class="container">
+        <div class="voice-selector-container">
+            <label for="voice-select">選擇發音人聲 (Select Natural Voice): </label>
+            <select id="voice-select"><option value="">載入人聲中...</option></select>
+            <button type="button" class="voice-test-btn" onclick="playAudio('Safety first. Please wear your protective equipment.')">🔊 測試聲音</button>
+            <div class="voice-hint">平板沒聲音？請調高音量、關閉靜音，並確認裝置已安裝英文語音。</div>
+        </div>
+
+        <div class="toolbar">
+            <button class="tool-btn primary" id="edit-toggle" onclick="toggleEditMode()">✏️ 進入編輯模式</button>
+            <button class="tool-btn edit-only" onclick="openPpeModal()">➕ 新增裝備</button>
+            <button class="tool-btn edit-only" onclick="openWoModal()">➕ 新增工單</button>
+            <button class="tool-btn edit-only" onclick="document.getElementById('batch-photo-input').click()">📷 批次匯入照片</button>
+            <button class="tool-btn edit-only" onclick="exportJSON()">⬇️ 匯出資料 (JSON)</button>
+            <button class="tool-btn edit-only" onclick="document.getElementById('import-json-input').click()">⬆️ 匯入資料</button>
+            <button class="tool-btn edit-only" onclick="exportHTML()">💾 下載離線版 HTML</button>
+            <button class="tool-btn danger edit-only" onclick="resetDefaults()">↺ 還原預設</button>
+            <input type="file" id="batch-photo-input" accept="image/*" multiple hidden>
+            <input type="file" id="import-json-input" accept=".json,application/json" hidden>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="btn-ppe" onclick="switchTab('page-ppe')">第一頁：PPE 裝備庫 (32種個人防護具)</button>
+            <button class="tab-btn" id="btn-wo" onclick="switchTab('page-wo')">第二頁：維修工單任務 (20套實戰情境)</button>
+            <button class="tab-btn" id="btn-game" onclick="switchTab('page-game')">第三頁：遊戲挑戰 🎮</button>
+        </div>
+
+        <div id="page-ppe" class="page active">
+            <div class="ppe-grid" id="ppe-container"></div>
+        </div>
+
+        <div id="page-wo" class="page">
+            <div class="wo-container" id="wo-container"></div>
+        </div>
+
+        <div id="page-game" class="page">
+            <div id="game-root"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="ppe-modal">
+        <div class="modal">
+            <h3 id="ppe-modal-title">新增裝備</h3>
+            <label for="f-name">裝備名稱 (Name)</label>
+            <input type="text" id="f-name" placeholder="例如：Safety Glasses">
+            <label for="f-purpose">用途 (Purpose)</label>
+            <textarea id="f-purpose"></textarea>
+            <label for="f-scenario">使用場景 (Scenario)</label>
+            <textarea id="f-scenario"></textarea>
+            <label for="f-ex">例句 (Example sentence，英文)</label>
+            <textarea id="f-ex" placeholder="例如：Please put on your safety glasses before drilling."></textarea>
+            <label for="f-exzh">例句中文翻譯</label>
+            <input type="text" id="f-exzh">
+            <label>實物照片（每項裝備需使用不同照片）</label>
+            <div class="photo-box" id="f-photo-box">尚未選擇照片</div>
+            <div class="photo-actions">
+                <button type="button" class="tool-btn" onclick="document.getElementById('f-photo').click()">📷 選擇照片</button>
+                <button type="button" class="tool-btn danger" id="f-photo-remove" onclick="removeEditingPhoto()">移除照片</button>
+                <input type="file" id="f-photo" accept="image/*" hidden>
+            </div>
+            <div id="view-controls" style="display:none">
+                <label for="v-zoom">縮放 <span id="zoom-label">100%</span></label>
+                <input type="range" id="v-zoom" min="1" max="3" step="0.05" value="1">
+                <label for="v-fit">顯示方式</label>
+                <select id="v-fit">
+                    <option value="cover">填滿框架（可能裁切邊緣）</option>
+                    <option value="contain">完整顯示（保留整張照片）</option>
+                </select>
+                <label for="v-ratio">框架比例</label>
+                <select id="v-ratio">
+                    <option value="">預設（寬扁）</option>
+                    <option value="16/9">16 : 9 橫式</option>
+                    <option value="4/3">4 : 3 橫式</option>
+                    <option value="1/1">1 : 1 正方形</option>
+                    <option value="3/4">3 : 4 直式</option>
+                </select>
+                <button type="button" class="tool-btn" id="v-reset">重設位置與縮放</button>
+                <div class="voice-hint">在預覽上拖曳可移動照片位置；滑桿或滑鼠滾輪可縮放。</div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="tool-btn" onclick="closeModal('ppe-modal')">取消</button>
+                <button type="button" class="tool-btn primary" onclick="savePpe()">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="wo-modal">
+        <div class="modal">
+            <h3 id="wo-modal-title">新增工單</h3>
+            <label for="w-title">工單標題 (Title)</label>
+            <input type="text" id="w-title" placeholder="例如：WO-21: Cabin Floor Inspection">
+            <label for="w-text">任務描述 (Task，朗讀用英文)</label>
+            <textarea id="w-text"></textarea>
+            <label for="w-titlezh">中文標題</label>
+            <input type="text" id="w-titlezh" placeholder="例如：WO-21：客艙地板檢查">
+            <label for="w-textzh">任務描述中文翻譯</label>
+            <textarea id="w-textzh"></textarea>
+            <label for="w-ans">必備專業防護裝備 (Answer)</label>
+            <textarea id="w-ans"></textarea>
+            <div class="modal-actions">
+                <button type="button" class="tool-btn" onclick="closeModal('wo-modal')">取消</button>
+                <button type="button" class="tool-btn primary" onclick="saveWo()">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal">
+            <p id="confirm-msg"></p>
+            <div class="modal-actions">
+                <button type="button" class="tool-btn" id="confirm-cancel" onclick="closeModal('confirm-modal')">取消</button>
+                <button type="button" class="tool-btn primary" id="confirm-ok">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script id="main-script">
+        let synth = window.speechSynthesis;
+        let voices = [];
+        let currentUtterance = null;   // 保留參照，避免部分平板瀏覽器把朗讀物件回收而中斷聲音
+        const voiceSelect = document.getElementById('voice-select');
+        const VOICE_KEY = 'ppeVoiceName';
+
+        function loadVoices() {
+            if (!synth) {
+                voiceSelect.innerHTML = '<option value="">此瀏覽器不支援語音朗讀</option>';
+                return;
+            }
+            voices = synth.getVoices();
+            let enVoices = voices.filter(v => (v.lang || '').toLowerCase().replace('_', '-').startsWith('en'));
+            if (enVoices.length === 0) enVoices = voices.slice();
+
+            // 讓高品質/自然的人聲排在前面
+            const keywords = ['natural', 'google', 'microsoft', 'premium', 'enhanced', 'siri'];
+            const score = v => keywords.reduce((acc, k) => acc + (v.name.toLowerCase().includes(k) ? 1 : 0), 0);
+            enVoices.sort((a, b) => score(b) - score(a));
+
+            let prev = voiceSelect.value;
+            if (!prev) { try { prev = localStorage.getItem(VOICE_KEY) || ''; } catch (e) {} }
+
+            voiceSelect.innerHTML = '';
+            const def = document.createElement('option');
+            def.value = '';
+            def.textContent = '系統預設英文人聲 (Default)';
+            voiceSelect.appendChild(def);
+            enVoices.forEach(voice => {
+                const option = document.createElement('option');
+                option.textContent = `${voice.name} (${voice.lang})`;
+                option.value = voice.name;
+                voiceSelect.appendChild(option);
+            });
+            if (prev && enVoices.some(v => v.name === prev)) voiceSelect.value = prev;
+        }
+
+        voiceSelect.addEventListener('change', () => {
+            try { localStorage.setItem(VOICE_KEY, voiceSelect.value); } catch (e) {}
+        });
+
+        if (synth && 'onvoiceschanged' in synth) {
+            synth.onvoiceschanged = loadVoices;
+        }
+        // 平板上的人聲清單常常延遲載入，重試幾次直到取得為止
+        let voiceTries = 0;
+        (function pollVoices() {
+            loadVoices();
+            if (synth && synth.getVoices().length === 0 && voiceTries++ < 20) setTimeout(pollVoices, 500);
+        })();
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            const btnId = { 'page-ppe': 'btn-ppe', 'page-wo': 'btn-wo', 'page-game': 'btn-game' }[tabId];
+            document.getElementById(btnId).classList.add('active');
+            if (tabId !== 'page-game' && typeof game !== 'undefined' && game) showMenu();   // 離開遊戲頁時停止計時
+        }
+
+        function playAudio(textToSpeak) {
+            if (!synth || typeof SpeechSynthesisUtterance === 'undefined') {
+                toast('此瀏覽器不支援語音朗讀，請改用 Chrome 或 Safari', true);
+                return;
+            }
+            const u = new SpeechSynthesisUtterance(textToSpeak);
+            u.lang = 'en-US';
+            const chosen = voices.find(v => v.name === voiceSelect.value);
+            if (chosen) { u.voice = chosen; u.lang = chosen.lang || 'en-US'; }
+            u.rate = 0.88;
+            u.pitch = 1.0;
+            u.volume = 1.0;
+            u.onerror = ev => {
+                if (ev.error && ev.error !== 'canceled' && ev.error !== 'interrupted') {
+                    toast('無法播放聲音：請確認音量與靜音開關，並在裝置設定中安裝英文語音', true);
+                }
+            };
+            currentUtterance = u;
+
+            const go = () => {
+                try { synth.resume(); synth.speak(u); } catch (e) {}
+            };
+            // 在使用者點擊的當下直接朗讀（iOS 需要）；若正在播放，先停止並稍等再播（Android 需要）
+            if (synth.speaking || synth.pending) {
+                synth.cancel();
+                setTimeout(go, 120);
+            } else {
+                go();
+            }
+        }
+
+        function toggleAnswerBox(id) {
+            const box = document.getElementById(`ans-box-${id}`);
+            const btn = document.getElementById(`ans-btn-${id}`);
+            if (box.style.display === 'block') {
+                box.style.display = 'none';
+                btn.textContent = '顯示答案 (Show Answer)';
+            } else {
+                box.style.display = 'block';
+                btn.textContent = '隱藏答案 (Hide Answer)';
+            }
+        }
+
+        // SVG 圖案庫：精確對應每項防護具
+        const svgLibrary = {
+            vest: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.42 10.16 8 11.42 4.58-1.26 8-6.17 8-11.42V6l-8-4zm-1 15h2v2h-2v-2zm0-8h2v5h-2V9z"/></svg>`,
+            boots: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M20.5 15l-3.5-3V4c0-.55-.45-1-1-1h-6c-.55 0-1 .45-1 1v12H4c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-4c0-.28-.11-.53-.3-.7z"/></svg>`,
+            glasses: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M21 7.5c-.83 0-1.5.67-1.5 1.5H19c0-1.38-1.13-2.5-2.5-2.5S14 7.62 14 9h-4c0-1.38-1.13-2.5-2.5-2.5S5 7.62 5 9h-.5c0-.83-.67-1.5-1.5-1.5S1.5 8.17 1.5 9v3c0 2.21 1.79 4 4 4H7c1.86 0 3.41-1.28 3.86-3h2.28c.45 1.72 2 3 3.86 3h1.5c2.21 0 4-1.79 4-4V9c0-.83-.67-1.5-1.5-1.5z"/></svg>`,
+            earmuffs: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 2c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-2c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/></svg>`,
+            helmet: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.17 19.64 10.53 20 12 20s2.83-.36 4.34-1.09l1.9 1.9c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.62-1.79C19.26 16.07 20 14.12 20 12c0-4.97-4.03-9-9-9z"/></svg>`,
+            gloves: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M19 10c-.55 0-1 .45-1 1v4h-1V7c0-.55-.45-1-1-1s-1 .45-1 1v8h-1V5c0-.55-.45-1-1-1s-1 .45-1 1v10h-1V8c0-.55-.45-1-1-1s-1 .45-1 1v8.5c0 .28.22.5.5.5s.5-.22.5-.5V14h1v3.5c0 2.48 2.02 4.5 4.5 4.5h3c2.48 0 4.5-2.02 4.5-4.5V11c0-.55-.45-1-1-1z"/></svg>`,
+            mask: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 12 10 10-4.48 10-12S17.52 2 12 2zm1 15.5h-2v-2h-2v-2h6v2h-2v2zm3.5-6.5h-7v-2h7v2z"/></svg>`,
+            tools: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L7.8 4.8 4.8 7.8 1.7 4.7C.6 7.1 1 10.1 3 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.4-.4.4-1.1 0-1.4z"/></svg>`,
+            harness: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm4 9V8c0-2.21-1.79-4-4-4S8 5.79 8 8v3c-1.66 0-3 1.34-3 3v6h3v-4h2v4h4v-4h2v4h3v-6c0-1.66-1.34-3-3-3z"/></svg>`
+        };
+
+        const ppeItems = [
+            { name: "Reflective Vest", purpose: "Enhances visual awareness of personnel on the active ramp, taxiway, or hangar floor.", scenario: "Mandatory for all ramp operations, day and night, to prevent aircraft ground collision accidents.", icon: svgLibrary.vest },
+            { name: "Steel-toe Safety Boots", purpose: "Protects feet from crushing injuries, sharp punctures, and heavy falling materials.", scenario: "Mandatory baseline footwear for entering any aircraft maintenance zones.", icon: svgLibrary.boots },
+            { name: "Safety Glasses", purpose: "Protects eyes from flying debris, foreign object debris (FOD), dust, and structural metallic fragments.", scenario: "Worn during drilling, cutting lockwires, grinding, or general mechanical component assembly.", icon: svgLibrary.glasses },
+            { name: "Chemical Splash Goggles", purpose: "Provides a secure fluid-tight peripheral seal around the eyes against airborne chemical mist or splashes.", scenario: "Mandatory when servicing Skydrol hydraulic fluid, engine turbine oil, or aircraft fuel.", icon: svgLibrary.glasses },
+            { name: "Face Shield", purpose: "Offers full-face coverage from heavy chemical splashes, high-pressure fluid leaks, and flying particles.", scenario: "Used during aircraft battery replacements, servicing high-pressure lines, or handling bulk solvents.", icon: svgLibrary.glasses },
+            { name: "Ear Muffs", purpose: "Provides maximum acoustic insulation to block high-frequency, extreme decibel noise from running turbine engines.", scenario: "Worn on active aprons during auxiliary power unit (APU) runs, engine test operations, or marshalling duties.", icon: svgLibrary.earmuffs },
+            { name: "Ear Plugs", purpose: "Inserts directly into the ear canal to attenuate moderate workplace ambient noise.", scenario: "Used for long-duration routine maintenance inside general hangar production environments.", icon: svgLibrary.earmuffs },
+            { name: "Bump Cap", purpose: "Protects the skull from minor lacerations, bumps, and scrapes in low-overhead, confined environments.", scenario: "Worn during inspections inside the electronics bay (E-E bay), cargo compartments, or wheel wells.", icon: svgLibrary.helmet },
+            { name: "Safety Helmet (with chin strap)", purpose: "Provides heavy impact defense for the head and remains secure to the skull during accidental falls.", scenario: "Mandatory when working on high-access stands, cherry pickers (scissor lifts), or top fuselage tasks.", icon: svgLibrary.helmet },
+            { name: "Nitrile Chemical Gloves", purpose: "Resists aggressive aviation chemicals, lubricating fluid, oils, and highly toxic fluids.", scenario: "Worn during routine flight-line oil checks, fluid top-ups, and component wipe-down inspections.", icon: svgLibrary.gloves },
+            { name: "Heavy-duty Leather Gloves", purpose: "Provides robust skin shield against cuts, punctures, abrasive rough surfaces, and high friction.", scenario: "Worn during aircraft main wheel assembly replacements, brake swaps, and heavy structural panel work.", icon: svgLibrary.gloves },
+            { name: "Heat-resistant Gloves", purpose: "Insulates hands from severe thermal burns when handling hot components or running components.", scenario: "Worn during immediate post-arrival inspections near the hot engine exhaust nozzle or brake drums.", icon: svgLibrary.gloves },
+            { name: "Anti-static Wrist Strap", purpose: "Channels electrostatic charges away from the body to ground, preventing Electrostatic Discharge (ESD) damage.", scenario: "Mandatory whenever handling flight control computers, avionics cards, or navigation radar hardware.", icon: svgLibrary.tools },
+            { name: "Insulated Rubber Gloves", purpose: "Provides certified dielectric insulation to protect technicians against high-voltage electrical arcs.", scenario: "Used during electrical power system diagnostics, troubleshooting live circuits, or connecting external power carts.", icon: svgLibrary.gloves },
+            { name: "Full-body Safety Harness", purpose: "Distributes dynamic forces and safely arrests falls from dangerous heights to prevent critical trauma.", scenario: "Mandatory for tasks on the aircraft upper wings, vertical stabilizer, or top-center fuselage areas.", icon: svgLibrary.harness },
+            { name: "Lanyard with Shock Absorber", purpose: "Connects the safety harness securely to a structural life-line or anchor point while breaking momentum during a fall.", scenario: "Must always be paired with the safety harness during any open, elevated maintenance work.", icon: svgLibrary.harness },
+            { name: "Dust Mask (N95/Particulate)", purpose: "Filters dangerous airborne particulate matter, dust fibers, and microscopic elements from entering lungs.", scenario: "Worn when cleaning main landing gear assemblies heavily coated with toxic carbon brake dust.", icon: svgLibrary.mask },
+            { name: "Air-purifying Respirator (Gas Mask)", purpose: "Neutralizes toxic gaseous chemical fumes, dangerous organic vapors, and heavy paint vapors via chemical canisters.", scenario: "Mandatory during composite structure adhesive bonding, structural spray painting, or fuel line resealing.", icon: svgLibrary.mask },
+            { name: "Self-Contained Breathing Apparatus (SCBA)", purpose: "Supplies self-contained, completely independent clean breathable air in oxygen-deficient or life-threatening environments.", scenario: "Utilized by specialized teams entering completely sealed, unventilated, high-hazard internal fuel tank deep cells.", icon: svgLibrary.mask },
+            { name: "Anti-static Coveralls", purpose: "Constructed with specialized materials that prevent structural static spark discharge that could detonate fuel mist.", scenario: "Mandatory uniform for technical teams entering internal fuel cells or executing fuel tank component swaps.", icon: svgLibrary.vest },
+            { name: "Disposable Tyvek Coveralls", purpose: "Provides a full-body barrier to shield personal garments from sticky sealants, greasy grease, and wet lubricants.", scenario: "Worn during heavy landing gear structural lubrication tasks or vacuum toilet system plumbing maintenance.", icon: svgLibrary.vest },
+            { name: "Chemical-resistant Apron", purpose: "Provides robust, impermeable liquid protection for the torso against highly aggressive corrosive acids.", scenario: "Worn when handling chemical vats or performing service maintenance inside the aircraft battery charging shop.", icon: svgLibrary.vest },
+            { name: "Anti-slip Winter Boots", purpose: "Engineered with maximum traction compounds to prevent slipping on slick, wet, or ice-coated winter tarmac.", scenario: "Worn on the freezing flight line during severe winter operations and winter de-icing shifts.", icon: svgLibrary.boots },
+            { name: "Knee Pads", purpose: "Relieves excessive mechanical pressure and protects knees from bruising during prolonged kneeling.", scenario: "Used during extended passenger seat track repairs, electronics tray wiring, or floorboard installations.", icon: svgLibrary.tools },
+            { name: "Welding Face Shield", purpose: "Filters dangerous bright arcs, blocks intense infrared/ultraviolet light, and catches hot sparks.", scenario: "Worn by structural aviation metal repair technicians during hangar structural component welding operations.", icon: svgLibrary.glasses },
+            { name: "Cryogenic Gloves", purpose: "Provides specialized sub-zero thermal protection to guard skin from instant frostbite caused by supercooled items.", scenario: "Worn when replenishing the Liquid Oxygen (LOX) system or distributing structural dry ice packs.", icon: svgLibrary.gloves },
+            { name: "Lighted Marshalling Wands", purpose: "Emits highly noticeable illuminated signals to allow clear communications with the cockpit flight crew in low-light.", scenario: "Essential equipment utilized for guiding arriving or departing aircraft on the dark ramp during night shifts.", icon: svgLibrary.tools },
+            { name: "Gas Detector", purpose: "Constantly samples ambient atmosphere to alert against oxygen deficiency, flammable vapor build-ups, or toxic gas.", scenario: "Used to clear and monitor internal spaces before and during a technician's entry into a fuel tank.", icon: svgLibrary.tools },
+            { name: "Flashlight / Headlamp", purpose: "Delivers essential localized illumination into dark, complex structural compartments.", scenario: "Used for overnight pre-flight airframe walk-around checks, tail-cone interior sweeps, and cargo liner inspections.", icon: svgLibrary.tools },
+            { name: "Raincoat (High-Visibility)", purpose: "Provides water resistance while maximizing visibility for outdoor operations during severe weather.", scenario: "Worn during routine flight-line transit checks, aircraft arrival servicing, or ramp fueling under heavy downpours.", icon: svgLibrary.vest },
+            { name: "Insulated Winter Jacket", purpose: "Maintains optimal body core temperatures and physical dexterity in sub-zero winter temperatures.", scenario: "Worn for outdoor line maintenance during deep-freeze arctic or winter seasonal flight operations.", icon: svgLibrary.vest },
+            { name: "Waterproof Long Rubber Gloves", purpose: "Provides full biohazard liquid protection stretching over the forearms.", scenario: "Mandatory gear when servicing or unblocking the highly unsanitary aircraft vacuum toilet waste lines.", icon: svgLibrary.gloves }
+        ];
+
+        const workOrders = [
+            { id: 1, title: "WO-01: Apron Refueling in Heavy Rain", text: "Refueling the aircraft in heavy rain on the active apron.", ans: "Raincoat (雨衣), Chemical-resistant gloves (防化學手套), Safety glasses (護目鏡)." },
+            { id: 2, title: "WO-02: Landing Gear Hydraulic Leak", text: "Checking a hydraulic leak in the Main Landing Gear (MLG) bay.", ans: "Chemical goggles (防化學護目鏡), Nitrile gloves (丁腈防化學手套), Bump cap/Safety helmet (工程帽/安全帽)." },
+            { id: 3, title: "WO-03: IDG Generator Oil Top-up", text: "Servicing Engine 1 integrated drive generator (IDG) oil.", ans: "Heat-resistant/Chemical gloves (耐熱/防化學手套), Face shield (防護面罩)." },
+            { id: 4, title: "WO-04: Overnight Fuel Tank Draining", text: "Draining water from the fuel tanks during the overnight check.", ans: "Chemical-resistant gloves (防化學手套), Safety glasses (護目鏡), Fuel-resistant apron (防油圍裙)." },
+            { id: 5, title: "WO-05: Hot Summer Tire Replacement", text: "Replacing the Main Landing Gear (MLG) tire on a hot summer afternoon.", ans: "Heavy-duty work gloves (防護工作手套), Safety glasses (護目鏡), Sun hat/UV protection (防曬帽/防曬用品)." },
+            { id: 6, title: "WO-06: Main Gear Brake Assembly Swap", text: "Replacing a worn brake assembly on the left main gear.", ans: "Heavy-duty work gloves (防護工作手套), Dust mask (防塵口罩/防煞車粉塵), Safety glasses (護目鏡)." },
+            { id: 7, title: "WO-07: High-Altitude Tail Panel Repair", text: "Repairing a loose panel on the vertical stabilizer using a cherry picker (scissor lift).", ans: "Full-body safety harness (全身式安全帶), Lanyard with shock absorber (防墜緩衝拉繩), Safety helmet with chin strap (帶下巴帶的安全帽)." },
+            { id: 8, title: "WO-08: Windshield Wiper Replacement", text: "Replacing windshield wiper blades while standing on a maintenance stand.", ans: "Safety helmet (安全帽), Safety glasses (護目鏡), Anti-slip work gloves (防滑工作手套)." },
+            { id: 9, title: "WO-09: Weather Radar Troubleshooting", text: "Troubleshooting the Weather Radar system in the aircraft nose cone.", ans: "Anti-static wrist strap (防靜電手環), Insulated tools/gloves (絕緣工具/手套)." },
+            { id: 10, title: "WO-10: Cockpit Heated Glass Replacement", text: "Replacing a cracked windshield heated glass in the cockpit.", ans: "Heavy-duty work gloves (防護工作手套), Safety glasses (護目鏡)." },
+            { id: 11, title: "WO-11: Aircraft Main Battery Swap", text: "Removing and replacing the Main Aircraft Battery in the electronics bay (E-E bay).", ans: "Acid-resistant gloves (防酸手套), Face shield (防護面罩), Rubber apron (橡膠圍裙)." },
+            { id: 12, title: "WO-12: Overnight Under-floor Wire Inspection", text: "Inspecting wire bundles under the cabin floor during the night shift.", ans: "Flashlight/Headlamp (手電筒/頭燈), Bump cap (防撞帽), Dust mask (防塵口罩)." },
+            { id: 13, title: "WO-13: Immediate Post-Arrival Inspection", text: "Conducting a Post-Arrival Inspection right after the aircraft engines shut down.", ans: "Ear muffs/Ear plugs (防噪音耳罩/耳塞), Heat-resistant gloves (耐熱手套)." },
+            { id: 14, title: "WO-14: Winter Blizzard Walk-around", text: "Performing a 360-degree Walk-around check during a severe winter blizzard.", ans: "Winter insulated jacket (防寒外套), Anti-slip boots (防滑鞋/冰爪), Anti-fog safety glasses (防霧護目鏡)." },
+            { id: 15, title: "WO-15: Night Shift Aircraft Marshalling", text: "Marshalling an arriving aircraft into the gate during the night shift.", ans: "Lighted marshalling wands (發光引導棒), Ear muffs (防噪音耳罩)." },
+            { id: 16, title: "WO-16: Apron Skydrol Chemical Spill Clean-up", text: "Cleaning a chemical spill (Skydrol hydraulic fluid) on the apron.", ans: "Chemical splash suit (防化學潑濺服), Nitrile gloves (丁腈手套), Chemical goggles (防化學護目鏡)." },
+            { id: 17, title: "WO-17: Cargo Compartment Smoke Inspection", text: "Inspecting the Forward Cargo Compartment for an active smoke warning.", ans: "Full-face respirator/SCBA (全面罩呼吸器/空氣呼吸器), Flashlight (手電筒), Safety helmet (安全帽)." },
+            { id: 18, title: "WO-18: Confined Space Fuel Tank Entry", text: "Performing an internal inspection of the horizontal stabilizer tank (Confined Space).", ans: "Air-purifying respirator (防毒面具), Anti-static coveralls (防靜電連身工作服), Gas detector (氣體偵測器)." },
+            { id: 19, title: "WO-19: Passenger Seat Frame Repair", text: "Replacing a broken passenger seat frame in the cabin.", ans: "Work gloves (工作手套), Safety glasses (護目鏡)." },
+            { id: 20, title: "WO-20: Vacuum Toilet Blockage Clearance", text: "Clearing a blockage in the aircraft vacuum toilet waste lines.", ans: "Waterproof long gloves (防水長手套), Face shield (防護面罩), Disposable coveralls (拋棄式防護衣)." }
+        ];
+
+        // ================= 資料層：可新增、編輯、刪除 =================
+        // 內建例句與中文翻譯
+        const PPE_EXAMPLES = {"Reflective Vest": ["Please put on your reflective vest before you walk onto the ramp.", "走上停機坪之前，請先穿上反光背心。"], "Steel-toe Safety Boots": ["You must wear steel-toe safety boots in the maintenance area.", "在維修區必須穿著鋼頭安全鞋。"], "Safety Glasses": ["I wear safety glasses when I drill the metal panel.", "我在鑽金屬面板時會戴安全護目鏡。"], "Chemical Splash Goggles": ["Put on chemical splash goggles before you service the hydraulic fluid.", "維修液壓油之前，請戴上防化學噴濺護目鏡。"], "Face Shield": ["A face shield protects your whole face from high-pressure leaks.", "防護面罩能保護整張臉，避免高壓液體洩漏。"], "Ear Muffs": ["The engine is running, so wear ear muffs on the apron.", "引擎正在運轉，所以在停機坪要戴耳罩。"], "Ear Plugs": ["I use ear plugs during long shifts in the noisy hangar.", "在吵雜的機庫長時間工作時，我會使用耳塞。"], "Bump Cap": ["Wear a bump cap when you inspect the wheel well.", "檢查輪艙時請戴防撞帽。"], "Safety Helmet (with chin strap)": ["Fasten the chin strap of your safety helmet before you climb the stand.", "爬上工作架之前，請先扣好安全帽的下巴帶。"], "Nitrile Chemical Gloves": ["Wear nitrile chemical gloves when you check the engine oil.", "檢查引擎滑油時要戴丁腈防化學手套。"], "Heavy-duty Leather Gloves": ["Heavy-duty leather gloves protect your hands from sharp metal edges.", "重型皮手套可以保護雙手不被尖銳的金屬邊緣割傷。"], "Heat-resistant Gloves": ["Use heat-resistant gloves near the hot brake drums.", "在高溫的煞車鼓附近要使用耐熱手套。"], "Anti-static Wrist Strap": ["Connect your anti-static wrist strap before touching the avionics card.", "碰觸電子設備電路板之前，請先接上防靜電手環。"], "Insulated Rubber Gloves": ["Insulated rubber gloves protect you from high-voltage shock.", "絕緣橡膠手套可以保護你避免高壓電擊。"], "Full-body Safety Harness": ["Check your full-body safety harness before working on the wing.", "在機翼上工作之前，請檢查你的全身式安全帶。"], "Lanyard with Shock Absorber": ["Attach the lanyard with shock absorber to the anchor point.", "把附緩衝器的安全繩扣在固定點上。"], "Dust Mask (N95/Particulate)": ["Wear a dust mask when you clean the brake dust from the landing gear.", "清理起落架上的煞車粉塵時要戴防塵口罩。"], "Air-purifying Respirator (Gas Mask)": ["An air-purifying respirator filters toxic paint fumes.", "空氣淨化呼吸器可以過濾有毒的油漆煙霧。"], "Self-Contained Breathing Apparatus (SCBA)": ["The rescue team uses SCBA when they enter the fuel tank.", "救援小組進入油箱時會使用自給式呼吸器。"], "Anti-static Coveralls": ["Anti-static coveralls prevent sparks near fuel vapor.", "防靜電連身工作服可以避免燃油蒸氣附近產生火花。"], "Disposable Tyvek Coveralls": ["Throw away the disposable Tyvek coveralls after the dirty job.", "做完骯髒的工作後，請丟棄拋棄式特衛強防護衣。"], "Chemical-resistant Apron": ["Put on a chemical-resistant apron to protect your body from acid.", "穿上耐化學圍裙，保護身體免受酸液傷害。"], "Anti-slip Winter Boots": ["Anti-slip winter boots keep you safe on the icy ramp.", "防滑冬季靴讓你在結冰的停機坪上保持安全。"], "Knee Pads": ["Use knee pads when you kneel on the cabin floor for a long time.", "長時間跪在客艙地板上工作時要使用護膝。"], "Welding Face Shield": ["A welding face shield blocks bright light and hot sparks.", "焊接面罩可以阻擋強光和高溫火花。"], "Cryogenic Gloves": ["Wear cryogenic gloves when you handle liquid oxygen.", "處理液態氧時要戴低溫防護手套。"], "Lighted Marshalling Wands": ["At night, the marshaller guides the aircraft with lighted marshalling wands.", "夜間，指揮員用發光引導棒引導飛機。"], "Gas Detector": ["Check the air with a gas detector before you enter the fuel tank.", "進入油箱之前，先用氣體偵測器檢查空氣。"], "Flashlight / Headlamp": ["Bring a flashlight for the night inspection of the tail cone.", "夜間檢查尾錐時，請帶手電筒。"], "Raincoat (High-Visibility)": ["Wear a high-visibility raincoat when you work on the ramp in heavy rain.", "在大雨中的停機坪工作時要穿高能見度雨衣。"], "Insulated Winter Jacket": ["An insulated winter jacket keeps your body warm in freezing weather.", "保暖冬季外套可在酷寒天氣中讓身體保持溫暖。"], "Waterproof Long Rubber Gloves": ["Waterproof long rubber gloves protect your arms when you clear the toilet lines.", "防水長橡膠手套可以在疏通馬桶管線時保護你的手臂。"]};
+        const WO_ZH = {"1": ["WO-01：大雨中的停機坪加油", "在使用中的停機坪上，於大雨中為飛機加油。"], "2": ["WO-02：起落架液壓油洩漏", "檢查主起落架（MLG）艙內的液壓油洩漏。"], "3": ["WO-03：IDG 發電機滑油補充", "為一號發動機的整合驅動發電機（IDG）補充滑油。"], "4": ["WO-04：夜間油箱排水", "在夜間檢查時，排放油箱內的積水。"], "5": ["WO-05：炎夏更換輪胎", "在炎熱的夏日午後更換主起落架（MLG）輪胎。"], "6": ["WO-06：主輪煞車組件更換", "更換左主起落架上磨損的煞車組件。"], "7": ["WO-07：高空尾翼面板修理", "使用升降工作台（剪式升降機）修理垂直安定面上鬆脫的面板。"], "8": ["WO-08：擋風玻璃雨刷更換", "站在維修工作架上更換擋風玻璃雨刷片。"], "9": ["WO-09：氣象雷達排故", "在機鼻錐內對氣象雷達系統進行故障排除。"], "10": ["WO-10：駕駛艙加熱玻璃更換", "更換駕駛艙內破裂的擋風玻璃加熱玻璃。"], "11": ["WO-11：飛機主電瓶更換", "在電子設備艙（E-E bay）內拆下並更換飛機主電瓶。"], "12": ["WO-12：夜間地板下線束檢查", "在夜班期間檢查客艙地板下的線束。"], "13": ["WO-13：落地後立即檢查", "飛機引擎關閉後，立刻進行落地後檢查。"], "14": ["WO-14：冬季暴風雪繞機檢查", "在嚴重的冬季暴風雪中進行 360 度繞機檢查。"], "15": ["WO-15：夜班飛機引導", "夜班期間，引導進場的飛機停入登機門。"], "16": ["WO-16：停機坪 Skydrol 化學液體洩漏清理", "清理停機坪上的化學液體洩漏（Skydrol 液壓油）。"], "17": ["WO-17：貨艙煙霧檢查", "因發出煙霧警告，檢查前貨艙。"], "18": ["WO-18：密閉空間油箱進入", "對水平安定面油箱（密閉空間）進行內部檢查。"], "19": ["WO-19：乘客座椅骨架維修", "更換客艙內斷裂的乘客座椅骨架。"], "20": ["WO-20：真空馬桶堵塞疏通", "疏通飛機真空馬桶的廢水管線堵塞。"]};
+
+        svgLibrary.generic = `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>`;
+
+        const DATA_KEY = 'ppeGameData_v2';
+        const $ = id => document.getElementById(id);
+        const ppeContainer = $('ppe-container');
+        const woContainer = $('wo-container');
+
+        const esc = s => String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        const iconKeyOf = icon => Object.keys(svgLibrary).find(k => svgLibrary[k] === icon) || 'generic';
+        const RATIOS = ['', '16/9', '4/3', '1/1', '3/4'];
+        const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+        const viewDefaults = () => ({ zoom: 1, tx: 0, ty: 0, fit: 'cover', ratio: '' });
+        function clampView(v) {
+            v.zoom = clamp(Number(v.zoom) || 1, 1, 3);
+            const m = (v.zoom - 1) * 50;                      // 放大後可移動的範圍
+            v.tx = clamp(Number(v.tx) || 0, -m, m);
+            v.ty = clamp(Number(v.ty) || 0, -m, m);
+            v.fit = v.fit === 'contain' ? 'contain' : 'cover';
+            v.ratio = RATIOS.includes(v.ratio) ? v.ratio : '';
+            return v;
+        }
+        const viewOf = it => clampView({ zoom: it.zoom, tx: it.tx, ty: it.ty, fit: it.fit, ratio: it.ratio });
+        function styleFrame(box, v) {
+            box.style.height = v.ratio ? 'auto' : '';
+            box.style.aspectRatio = v.ratio || '';
+        }
+        function styleImg(img, v) {
+            img.style.objectFit = v.fit;
+            img.style.transform = `translate(${v.tx}%, ${v.ty}%) scale(${v.zoom})`;
+        }
+        const isImageData = v => typeof v === 'string' && /^data:image\/(jpeg|png|webp|gif);base64,/.test(v);
+
+        function defaultData() {
+            return {
+                savedAt: 0,
+                ppe: ppeItems.map((it, i) => ({
+                    id: 'p' + (i + 1), name: it.name, purpose: it.purpose, scenario: it.scenario,
+                    iconKey: iconKeyOf(it.icon), photo: '', ...viewDefaults(),
+                    ex: (PPE_EXAMPLES[it.name] || ['', ''])[0], exZh: (PPE_EXAMPLES[it.name] || ['', ''])[1]
+                })),
+                wo: workOrders.map(w => ({ id: 'w' + w.id, title: w.title, text: w.text, ans: w.ans,
+                    titleZh: (WO_ZH[w.id] || ['', ''])[0], textZh: (WO_ZH[w.id] || ['', ''])[1] }))
+            };
+        }
+
+        function sanitize(d) {
+            if (!d || !Array.isArray(d.ppe) || !Array.isArray(d.wo)) throw new Error('格式不正確');
+            const s = v => typeof v === 'string' ? v : '';
+            return {
+                savedAt: Number(d.savedAt) || 0,
+                ppe: d.ppe.map(p => ({
+                    id: s(p.id) || uid('p'), name: s(p.name).trim(), purpose: s(p.purpose), scenario: s(p.scenario),
+                    iconKey: svgLibrary[p.iconKey] ? p.iconKey : 'generic', photo: isImageData(p.photo) ? p.photo : '',
+                    ...viewOf(p),
+                    ex: p.ex === undefined ? (PPE_EXAMPLES[s(p.name).trim()] || ['', ''])[0] : s(p.ex),
+                    exZh: p.exZh === undefined ? (PPE_EXAMPLES[s(p.name).trim()] || ['', ''])[1] : s(p.exZh)
+                })).filter(p => p.name),
+                wo: d.wo.map(w => {
+                    const def = WO_ZH[s(w.id).replace(/^w/, '')] || ['', ''];
+                    return {
+                        id: s(w.id) || uid('w'), title: s(w.title), text: s(w.text), ans: s(w.ans),
+                        titleZh: w.titleZh === undefined ? def[0] : s(w.titleZh),
+                        textZh: w.textZh === undefined ? def[1] : s(w.textZh)
+                    };
+                })
+                    .filter(w => w.title || w.text)
+            };
+        }
+
+        function loadState() {
+            const candidates = [];
+            try { const raw = localStorage.getItem(DATA_KEY); if (raw) candidates.push(sanitize(JSON.parse(raw))); } catch (e) {}
+            try { if (window.INITIAL_DATA) candidates.push(sanitize(window.INITIAL_DATA)); } catch (e) {}
+            candidates.sort((a, b) => b.savedAt - a.savedAt);   // 取最新的一份
+            return candidates[0] || defaultData();
+        }
+
+        let state = loadState();
+        let toastTimer;
+
+        function toast(msg, bad) {
+            const t = $('toast');
+            t.textContent = msg;
+            t.className = 'show' + (bad ? ' bad' : '');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { t.className = ''; }, 3200);
+        }
+
+        function save() {
+            state.savedAt = Date.now();
+            try { localStorage.setItem(DATA_KEY, JSON.stringify(state)); }
+            catch (e) { toast('⚠️ 無法儲存到瀏覽器，請用「匯出資料」或「下載離線版」保存', true); }
+        }
+
+        // ================= 簡易對話框（不使用 alert/confirm，避免被環境擋掉） =================
+        function openModal(id) { $(id).classList.add('open'); }
+        function closeModal(id) { $(id).classList.remove('open'); }
+
+        function openConfirm(msg, onOk, infoOnly) {
+            $('confirm-msg').textContent = msg;
+            $('confirm-cancel').style.display = infoOnly ? 'none' : '';
+            $('confirm-ok').textContent = infoOnly ? '知道了' : '確定';
+            $('confirm-ok').onclick = () => { closeModal('confirm-modal'); if (onOk) onOk(); };
+            openModal('confirm-modal');
+        }
+
+        // ================= 畫面渲染 =================
+        function updateTabLabels() {
+            $('btn-ppe').textContent = `第一頁：PPE 裝備庫 (${state.ppe.length}種個人防護具)`;
+            $('btn-wo').textContent = `第二頁：維修工單任務 (${state.wo.length}套實戰情境)`;
+        }
+
+        function renderPpe() {
+            ppeContainer.innerHTML = '';
+            if (!state.ppe.length) {
+                ppeContainer.innerHTML = '<div class="empty-hint">目前沒有裝備，請進入編輯模式後按「新增裝備」。</div>';
+            }
+            state.ppe.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'ppe-card';
+                card.dataset.id = item.id;
+                card.innerHTML = `
+                    <div class="ppe-image-container"></div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h3 class="ppe-title">${esc(item.name)}</h3>
+                            <button class="audio-btn" data-act="speak" title="發音">🔊</button>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Purpose / 用途: <button class="mini-audio" data-act="speak-purpose" title="朗讀用途">🔊</button></strong> <span>${esc(item.purpose)}</span></p>
+                            <p><strong>Scenario / 使用場景: <button class="mini-audio" data-act="speak-scenario" title="朗讀使用場景">🔊</button></strong> <span>${esc(item.scenario)}</span></p>
+                            ${item.ex ? `<div class="ex-box"><strong>Example / 例句: <button class="mini-audio" data-act="speak-ex" title="朗讀例句">🔊</button></strong>
+                                <div class="ex-en">${esc(item.ex)}</div>${item.exZh ? `<div class="ex-zh">${esc(item.exZh)}</div>` : ''}</div>` : ''}
+                        </div>
+                        <div class="card-tools edit-only">
+                            <button data-act="edit-ppe">✏️ 編輯</button>
+                            <button data-act="del-ppe" class="danger">🗑 刪除</button>
+                        </div>
+                    </div>`;
+                const box = card.querySelector('.ppe-image-container');
+                if (isImageData(item.photo)) {
+                    const img = new Image();
+                    img.className = 'ppe-photo';
+                    img.alt = item.name;
+                    img.src = item.photo;
+                    box.appendChild(img);
+                    const v = viewOf(item);
+                    styleFrame(box, v);
+                    styleImg(img, v);
+                } else {
+                    box.innerHTML = svgLibrary[item.iconKey] || svgLibrary.generic;
+                }
+                ppeContainer.appendChild(card);
+            });
+            updateTabLabels();
+        }
+
+        function renderWo() {
+            woContainer.innerHTML = '';
+            if (!state.wo.length) {
+                woContainer.innerHTML = '<div class="empty-hint">目前沒有工單，請進入編輯模式後按「新增工單」。</div>';
+            }
+            state.wo.forEach(wo => {
+                const card = document.createElement('div');
+                card.className = 'wo-card';
+                card.dataset.id = wo.id;
+                card.innerHTML = `
+                    <div class="wo-top">
+                        <span class="wo-id">${esc(wo.title)}</span>
+                        <div class="wo-btns">
+                            ${(wo.titleZh || wo.textZh) ? '<button class="wo-zh-btn" data-act="zh">🈶 顯示中文 (Show Chinese)</button>' : ''}
+                            <button class="wo-listen-btn" data-act="speak">🔊 聽題目 (Listen Task)</button>
+                        </div>
+                    </div>
+                    <div class="wo-question">${esc(wo.text)}</div>
+                    ${(wo.titleZh || wo.textZh) ? `<div class="wo-zh"><b>${esc(wo.titleZh)}</b>${esc(wo.textZh)}</div>` : ''}
+                    <div class="action-area">
+                        <button class="ans-toggle-btn" id="ans-btn-${esc(wo.id)}" data-act="toggle">顯示答案 (Show Answer)</button>
+                        <div class="ans-box" id="ans-box-${esc(wo.id)}">
+                            <strong>必備專業防護裝備 (Required PPE - Base wear excluded):</strong>
+                            <div class="ans-text">${esc(wo.ans)}</div>
+                        </div>
+                        <div class="card-tools edit-only">
+                            <button data-act="edit-wo">✏️ 編輯</button>
+                            <button data-act="del-wo" class="danger">🗑 刪除</button>
+                        </div>
+                    </div>`;
+                woContainer.appendChild(card);
+            });
+            updateTabLabels();
+        }
+
+        // ================= 卡片上的按鈕（事件委派） =================
+        ppeContainer.addEventListener('click', e => {
+            const btn = e.target.closest('button[data-act]');
+            if (!btn) return;
+            const id = btn.closest('.ppe-card').dataset.id;
+            const item = state.ppe.find(p => p.id === id);
+            if (!item) return;
+            if (btn.dataset.act === 'speak') playAudio(item.name);
+            if (btn.dataset.act === 'speak-purpose') playAudio(item.purpose);
+            if (btn.dataset.act === 'speak-scenario') playAudio(item.scenario);
+            if (btn.dataset.act === 'speak-ex') playAudio(item.ex);
+            if (btn.dataset.act === 'edit-ppe') openPpeModal(id);
+            if (btn.dataset.act === 'del-ppe') {
+                openConfirm(`確定要刪除裝備「${item.name}」嗎？`, () => {
+                    state.ppe = state.ppe.filter(p => p.id !== id);
+                    save(); renderPpe(); toast('已刪除');
+                });
+            }
+        });
+
+        woContainer.addEventListener('click', e => {
+            const btn = e.target.closest('button[data-act]');
+            if (!btn) return;
+            const id = btn.closest('.wo-card').dataset.id;
+            const wo = state.wo.find(w => w.id === id);
+            if (!wo) return;
+            if (btn.dataset.act === 'speak') playAudio(wo.text);
+            if (btn.dataset.act === 'toggle') toggleAnswerBox(id);
+            if (btn.dataset.act === 'zh') {
+                const zh = btn.closest('.wo-card').querySelector('.wo-zh');
+                const show = zh.style.display !== 'block';
+                zh.style.display = show ? 'block' : 'none';
+                btn.textContent = show ? '🙈 隱藏中文 (Hide Chinese)' : '🈶 顯示中文 (Show Chinese)';
+            }
+            if (btn.dataset.act === 'edit-wo') openWoModal(id);
+            if (btn.dataset.act === 'del-wo') {
+                openConfirm(`確定要刪除工單「${wo.title}」嗎？`, () => {
+                    state.wo = state.wo.filter(w => w.id !== id);
+                    save(); renderWo(); toast('已刪除');
+                });
+            }
+        });
+
+        function toggleEditMode() {
+            const on = document.body.classList.toggle('editing');
+            $('edit-toggle').textContent = on ? '✅ 完成編輯' : '✏️ 進入編輯模式';
+        }
+
+        // ================= 照片處理 =================
+        function fileToDataURL(file, maxSide = 640) {
+            return new Promise((resolve, reject) => {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => {
+                    const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+                    const c = document.createElement('canvas');
+                    c.width = Math.round(img.width * scale);
+                    c.height = Math.round(img.height * scale);
+                    const g = c.getContext('2d');
+                    g.fillStyle = '#fff';
+                    g.fillRect(0, 0, c.width, c.height);
+                    g.drawImage(img, 0, 0, c.width, c.height);
+                    URL.revokeObjectURL(url);
+                    resolve(c.toDataURL('image/jpeg', 0.82));
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('無法讀取圖片')); };
+                img.src = url;
+            });
+        }
+
+        const photoOwner = (data, exceptId) => data ? state.ppe.find(p => p.id !== exceptId && p.photo === data) : null;
+
+        // ================= 新增 / 編輯 裝備 =================
+        let editingPpeId = null;
+        let editingPhoto = '';
+        let editingView = viewDefaults();
+
+        function refreshPhotoPreview() {
+            const box = $('f-photo-box');
+            box.innerHTML = '';
+            const has = isImageData(editingPhoto);
+            box.classList.toggle('has-photo', has);
+            if (has) {
+                const img = new Image();
+                img.draggable = false;
+                img.src = editingPhoto;
+                box.appendChild(img);
+            } else {
+                box.textContent = '尚未選擇照片（將顯示預設圖示）';
+            }
+            $('f-photo-remove').style.display = has ? '' : 'none';
+            $('view-controls').style.display = has ? '' : 'none';
+            updatePreviewView();
+        }
+
+        function updatePreviewView() {
+            clampView(editingView);
+            const box = $('f-photo-box');
+            box.style.aspectRatio = editingView.ratio || '9/4';
+            const img = box.querySelector('img');
+            if (img) styleImg(img, editingView);
+            $('v-zoom').value = editingView.zoom;
+            $('zoom-label').textContent = Math.round(editingView.zoom * 100) + '%';
+            $('v-fit').value = editingView.fit;
+            $('v-ratio').value = editingView.ratio;
+        }
+
+        function openPpeModal(id) {
+            editingPpeId = id || null;
+            const it = id ? state.ppe.find(p => p.id === id) : null;
+            $('ppe-modal-title').textContent = it ? '編輯裝備' : '新增裝備';
+            $('f-name').value = it ? it.name : '';
+            $('f-purpose').value = it ? it.purpose : '';
+            $('f-scenario').value = it ? it.scenario : '';
+            $('f-ex').value = it ? (it.ex || '') : '';
+            $('f-exzh').value = it ? (it.exZh || '') : '';
+            editingPhoto = it ? it.photo : '';
+            editingView = it ? viewOf(it) : viewDefaults();
+            refreshPhotoPreview();
+            openModal('ppe-modal');
+            $('f-name').focus();
+        }
+
+        $('f-photo').addEventListener('change', async e => {
+            const file = e.target.files[0];
+            e.target.value = '';
+            if (!file) return;
+            try {
+                const data = await fileToDataURL(file);
+                const dup = photoOwner(data, editingPpeId);
+                if (dup) { toast(`這張照片已被「${dup.name}」使用，請換一張不同的`, true); return; }
+                editingPhoto = data;
+                editingView = viewDefaults();
+                refreshPhotoPreview();
+            } catch (err) { toast('無法讀取這張圖片', true); }
+        });
+
+        function removeEditingPhoto() { editingPhoto = ''; editingView = viewDefaults(); refreshPhotoPreview(); }
+
+        // 調整照片：縮放、顯示方式、框架比例、拖曳位置
+        $('v-zoom').addEventListener('input', e => { editingView.zoom = parseFloat(e.target.value); updatePreviewView(); });
+        $('v-fit').addEventListener('change', e => { editingView.fit = e.target.value; updatePreviewView(); });
+        $('v-ratio').addEventListener('change', e => { editingView.ratio = e.target.value; updatePreviewView(); });
+        $('v-reset').addEventListener('click', () => { editingView = { ...viewDefaults(), ratio: editingView.ratio }; updatePreviewView(); });
+
+        (function enablePhotoDrag() {
+            const pb = $('f-photo-box');
+            let drag = null;
+            pb.addEventListener('pointerdown', e => {
+                if (!isImageData(editingPhoto)) return;
+                pb.setPointerCapture(e.pointerId);
+                drag = { x: e.clientX, y: e.clientY, tx: editingView.tx, ty: editingView.ty };
+            });
+            pb.addEventListener('pointermove', e => {
+                if (!drag) return;
+                const r = pb.getBoundingClientRect();
+                editingView.tx = drag.tx + (e.clientX - drag.x) / r.width * 100;
+                editingView.ty = drag.ty + (e.clientY - drag.y) / r.height * 100;
+                updatePreviewView();
+            });
+            ['pointerup', 'pointercancel'].forEach(ev => pb.addEventListener(ev, () => { drag = null; }));
+            pb.addEventListener('wheel', e => {
+                if (!isImageData(editingPhoto)) return;
+                e.preventDefault();
+                editingView.zoom += e.deltaY < 0 ? 0.1 : -0.1;
+                updatePreviewView();
+            }, { passive: false });
+        })();
+
+        function savePpe() {
+            const name = $('f-name').value.trim();
+            if (!name) { toast('請輸入裝備名稱', true); return; }
+            if (state.ppe.some(p => p.id !== editingPpeId && p.name.toLowerCase() === name.toLowerCase())) {
+                toast('已經有同名的裝備了', true); return;
+            }
+            const dup = photoOwner(editingPhoto, editingPpeId);
+            if (dup) { toast(`照片與「${dup.name}」重複，請換一張`, true); return; }
+            const fields = { name, purpose: $('f-purpose').value.trim(), scenario: $('f-scenario').value.trim(), photo: editingPhoto,
+                ex: $('f-ex').value.trim(), exZh: $('f-exzh').value.trim(),
+                ...(editingPhoto ? clampView({ ...editingView }) : viewDefaults()) };
+            if (editingPpeId) {
+                Object.assign(state.ppe.find(p => p.id === editingPpeId), fields);
+            } else {
+                state.ppe.push({ id: uid('p'), iconKey: 'generic', ...fields });
+            }
+            save(); renderPpe(); closeModal('ppe-modal'); toast('已儲存');
+        }
+
+        // ================= 新增 / 編輯 工單 =================
+        let editingWoId = null;
+
+        function openWoModal(id) {
+            editingWoId = id || null;
+            const wo = id ? state.wo.find(w => w.id === id) : null;
+            $('wo-modal-title').textContent = wo ? '編輯工單' : '新增工單';
+            $('w-title').value = wo ? wo.title : `WO-${String(state.wo.length + 1).padStart(2, '0')}: `;
+            $('w-text').value = wo ? wo.text : '';
+            $('w-titlezh').value = wo ? (wo.titleZh || '') : '';
+            $('w-textzh').value = wo ? (wo.textZh || '') : '';
+            $('w-ans').value = wo ? wo.ans : '';
+            openModal('wo-modal');
+            $('w-title').focus();
+        }
+
+        function saveWo() {
+            const title = $('w-title').value.trim();
+            const text = $('w-text').value.trim();
+            if (!title || !text) { toast('請填寫標題與任務描述', true); return; }
+            const fields = { title, text, ans: $('w-ans').value.trim(), titleZh: $('w-titlezh').value.trim(), textZh: $('w-textzh').value.trim() };
+            if (editingWoId) {
+                Object.assign(state.wo.find(w => w.id === editingWoId), fields);
+            } else {
+                state.wo.push({ id: uid('w'), ...fields });
+            }
+            save(); renderWo(); closeModal('wo-modal'); toast('已儲存');
+        }
+
+        // ================= 批次匯入照片（檔名 = 裝備名稱，或以編號開頭如 01_xxx.jpg） =================
+        const norm = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '');
+
+        $('batch-photo-input').addEventListener('change', async e => {
+            const files = [...e.target.files];
+            e.target.value = '';
+            if (!files.length) return;
+            toast('照片處理中…');
+            const used = new Set(state.ppe.map(p => p.photo).filter(Boolean));
+            let ok = 0;
+            const skipped = [];
+            for (const f of files) {
+                const base = f.name.replace(/\.[^.]+$/, '');
+                const n = norm(base);
+                let target = state.ppe.find(p => norm(p.name) === n);
+                if (!target && n.length >= 4) {
+                    const c = state.ppe.filter(p => norm(p.name).includes(n));
+                    if (c.length === 1) target = c[0];
+                }
+                if (!target) {
+                    const m = base.match(/^(\d{1,3})(?:[\s_.\-]|$)/);
+                    if (m) target = state.ppe[parseInt(m[1], 10) - 1];
+                }
+                if (!target) { skipped.push(`${f.name}（找不到對應的裝備）`); continue; }
+                try {
+                    const data = await fileToDataURL(f);
+                    if (used.has(data) && target.photo !== data) { skipped.push(`${f.name}（照片重複）`); continue; }
+                    if (target.photo) used.delete(target.photo);
+                    target.photo = data;
+                    Object.assign(target, viewDefaults());
+                    used.add(data);
+                    ok++;
+                } catch (err) { skipped.push(`${f.name}（無法讀取）`); }
+            }
+            save(); renderPpe();
+            if (skipped.length) {
+                openConfirm(`成功配對 ${ok} 張。\n以下 ${skipped.length} 張未使用：\n${skipped.join('\n')}`, null, true);
+            } else {
+                toast(`已匯入 ${ok} 張照片`);
+            }
+        });
+
+        // ================= 匯出 / 匯入 / 還原 =================
+        function download(name, text, type) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([text], { type }));
+            a.download = name;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+        }
+
+        function exportJSON() {
+            download('ppe_training_data.json', JSON.stringify(state, null, 1), 'application/json');
+            toast('已匯出資料檔');
+        }
+
+        $('import-json-input').addEventListener('change', e => {
+            const file = e.target.files[0];
+            e.target.value = '';
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const data = sanitize(JSON.parse(reader.result));
+                    openConfirm(`將以檔案內容取代目前資料：\n裝備 ${data.ppe.length} 項、工單 ${data.wo.length} 筆。\n確定匯入嗎？`, () => {
+                        state = data;
+                        save(); renderPpe(); renderWo(); toast('匯入完成');
+                    });
+                } catch (err) { toast('匯入失敗：檔案格式不正確', true); }
+            };
+            reader.readAsText(file);
+        });
+
+        function resetDefaults() {
+            openConfirm('確定要還原成原始內容嗎？\n所有新增、修改與已上傳的照片都會被清除。', () => {
+                state = defaultData();
+                save(); renderPpe(); renderWo(); toast('已還原預設內容');
+            });
+        }
+
+        // 產生單一 HTML 檔：目前的所有內容（含照片）都內嵌，不需網路即可使用
+        function exportHTML() {
+            const clone = document.documentElement.cloneNode(true);
+            clone.querySelector('#ppe-container').innerHTML = '';
+            clone.querySelector('#wo-container').innerHTML = '';
+            clone.querySelector('#voice-select').innerHTML = '<option value="">載入人聲中...</option>';
+            clone.querySelector('body').classList.remove('editing');
+            clone.querySelector('#edit-toggle').textContent = '✏️ 進入編輯模式';
+            clone.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+            clone.querySelector('#toast').className = '';
+            clone.querySelector('#page-ppe').className = 'page active';
+            clone.querySelector('#page-wo').className = 'page';
+            clone.querySelector('#page-game').className = 'page';
+            clone.querySelector('#game-root').innerHTML = '';
+            clone.querySelector('#btn-game').className = 'tab-btn';
+            clone.querySelector('#btn-ppe').className = 'tab-btn active';
+            clone.querySelector('#btn-wo').className = 'tab-btn';
+            const data = document.createElement('script');
+            data.textContent = 'window.INITIAL_DATA = ' + JSON.stringify(state).replace(/</g, '\\u003c') + ';';
+            const main = clone.querySelector('#main-script');
+            main.parentNode.insertBefore(data, main);
+            download('aircraft_ppe_game_offline.html', '<!DOCTYPE html>\n' + clone.outerHTML, 'text/html');
+            toast('已下載離線版');
+        }
+
+        // 點擊視窗外側關閉編輯視窗
+        document.querySelectorAll('.modal-overlay').forEach(ov => {
+            ov.addEventListener('mousedown', e => { if (e.target === ov) ov.classList.remove('open'); });
+        });
+
+        renderPpe();
+        renderWo();
+
+        // ================= 第三頁：遊戲挑戰 =================
+        const gameRoot = $('game-root');
+        const HIGH_KEY = 'ppeHigh_v1';
+        let highs = {};
+        try { highs = JSON.parse(localStorage.getItem(HIGH_KEY) || '{}') || {}; } catch (e) { highs = {}; }
+        const saveHighs = () => { try { localStorage.setItem(HIGH_KEY, JSON.stringify(highs)); } catch (e) {} };
+
+        const MODES = [
+            { id: 'A', icon: '🖼️', name: '看圖選名稱', desc: '看裝備圖片，選出正確的英文名稱' },
+            { id: 'B', icon: '👂', name: '聽音選名稱', desc: '聽發音，選出你聽到的裝備' },
+            { id: 'C', icon: '🎯', name: '用途猜裝備', desc: '閱讀英文用途說明，猜是哪種裝備' },
+            { id: 'D', icon: '✍️', name: '例句填空', desc: '完成句子，選出缺少的裝備名稱' },
+            { id: 'E', icon: '🛠️', name: '工單選裝備', desc: '依維修工單，勾選所有必備裝備（可複選）' },
+            { id: 'F', icon: '🏆', name: '綜合挑戰', desc: '五種題型隨機出題，最有挑戰性' }
+        ];
+        const gameCfg = { count: 10, timer: true };
+        let game = null;
+
+        const shuffle = a => {
+            a = a.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        };
+        const sample = (a, n) => shuffle(a).slice(0, n);
+        const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        // ---- 題目素材整理 ----
+        function ppeBase(name) { return name.replace(/\s*\([^)]*\)\s*/g, ' ').trim(); }
+
+        function blankSentence(item) {
+            if (!item.ex) return null;
+            const c = [ppeBase(item.name)];
+            ppeBase(item.name).split('/').forEach(x => c.push(x.trim()));
+            const m = item.name.match(/\(([^)]*)\)/);
+            if (m) m[1].split('/').forEach(x => c.push(x.trim()));
+            const cands = [...new Set(c)].filter(x => x.length >= 3).sort((a, b) => b.length - a.length);
+            for (const cand of cands) {
+                const re = new RegExp(reEsc(cand), 'i');
+                if (re.test(item.ex)) return item.ex.replace(re, '_____');
+            }
+            return null;
+        }
+
+        function parseAns(ans) {
+            const out = [];
+            const re = /([^(),、;；]+?)\s*\(([^)]*)\)/g;
+            let m;
+            while ((m = re.exec(ans || ''))) {
+                const en = m[1].replace(/^[\s,.]+/, '').trim();
+                if (en) out.push({ en, zh: m[2].trim() });
+            }
+            return out;
+        }
+
+        const similar = (a, b) => {
+            a = a.toLowerCase(); b = b.toLowerCase();
+            return a.includes(b) || b.includes(a);
+        };
+
+        const hasPicture = p => !!p.photo || p.iconKey !== 'generic';
+
+        // ---- 出題 ----
+        function ppeOptions(item) {
+            const others = state.ppe.filter(p => p.id !== item.id && p.name.toLowerCase() !== item.name.toLowerCase());
+            return shuffle([item, ...sample(others, 3)]).map(p => ({ key: p.id, label: p.name, correct: p.id === item.id }));
+        }
+
+        function woQuestion(wo) {
+            const correct = parseAns(wo.ans);
+            const seen = new Set(correct.map(c => c.en.toLowerCase()));
+            const pool = [];
+            state.wo.forEach(w => {
+                if (w.id === wo.id) return;
+                parseAns(w.ans).forEach(c => {
+                    const k = c.en.toLowerCase();
+                    if (seen.has(k)) return;
+                    if (correct.some(x => similar(x.en, c.en) || similar(x.zh, c.zh))) return;
+                    seen.add(k);
+                    pool.push(c);
+                });
+            });
+            if (correct.length < 2 || pool.length < 3) return null;
+            const distract = sample(pool, Math.min(Math.max(3, correct.length), pool.length));
+            return {
+                type: 'E', kind: 'multi', wo, timeLimit: 30,
+                options: shuffle([
+                    ...correct.map(c => ({ key: c.en.toLowerCase(), label: `${c.en}（${c.zh}）`, correct: true })),
+                    ...distract.map(c => ({ key: c.en.toLowerCase(), label: `${c.en}（${c.zh}）`, correct: false }))
+                ])
+            };
+        }
+
+        function candidates(modeId) {
+            const out = [];
+            const types = modeId === 'F' ? ['A', 'B', 'C', 'D', 'E'] : [modeId];
+            types.forEach(t => {
+                if (t === 'E') {
+                    state.wo.forEach(wo => { const q = woQuestion(wo); if (q) out.push({ used: 'w:' + wo.id, q }); });
+                } else if (state.ppe.length >= 4) {
+                    state.ppe.forEach(item => {
+                        if (t === 'A' && !hasPicture(item)) return;
+                        if (t === 'C' && !item.purpose) return;
+                        let blank = null;
+                        if (t === 'D') { blank = blankSentence(item); if (!blank) return; }
+                        out.push({ used: 'p:' + item.id, q: { type: t, kind: 'single', item, blank, options: ppeOptions(item), timeLimit: 15 } });
+                    });
+                }
+            });
+            return out;
+        }
+
+        function buildQuestions(modeId, count) {
+            const used = new Set();
+            const qs = [];
+            for (const c of shuffle(candidates(modeId))) {
+                if (qs.length >= count) break;
+                if (used.has(c.used)) continue;
+                used.add(c.used);
+                qs.push(c.q);
+            }
+            return qs;
+        }
+
+        // ---- 畫面：主選單 ----
+        function showMenu() {
+            clearInterval(game && game.timerId);
+            game = null;
+            const cards = MODES.map(m => {
+                const n = candidates(m.id).length;
+                const best = highs[m.id] ? `最高分：${highs[m.id]}` : '尚未挑戰';
+                return `<button class="mode-card" data-g="start" data-mode="${m.id}" ${n ? '' : 'disabled'}>
+                    <div class="mode-icon">${m.icon}</div>
+                    <div class="mode-name">${m.name}</div>
+                    <div class="mode-desc">${m.desc}</div>
+                    <div class="mode-best">${n ? best : '題目不足（需至少 4 項裝備或相關資料）'}</div>
+                </button>`;
+            }).join('');
+            gameRoot.innerHTML = `
+                <div class="game-settings">
+                    <label>每回合題數
+                        <select id="g-count">
+                            ${[5, 10, 15, 20].map(n => `<option value="${n}" ${n === gameCfg.count ? 'selected' : ''}>${n} 題</option>`).join('')}
+                        </select>
+                    </label>
+                    <label><input type="checkbox" id="g-timer" ${gameCfg.timer ? 'checked' : ''}> ⏱️ 計時模式（答得越快分數越高）</label>
+                </div>
+                <div class="mode-grid">${cards}</div>
+                <p class="game-tip">計分：答對 +10 分；連續答對有連擊加分；計時模式另有速度加分。題目會依照「裝備庫」與「維修工單」目前的內容出題，你新增的內容也會出現在遊戲裡。</p>`;
+            $('g-count').addEventListener('change', e => { gameCfg.count = parseInt(e.target.value, 10); });
+            $('g-timer').addEventListener('change', e => { gameCfg.timer = e.target.checked; });
+        }
+
+        // ---- 畫面：開始 / 出題 ----
+        function startGame(modeId) {
+            const qs = buildQuestions(modeId, gameCfg.count);
+            if (!qs.length) { toast('目前沒有足夠的題目', true); return; }
+            game = { mode: modeId, qs, idx: 0, score: 0, combo: 0, bestCombo: 0, right: 0, wrong: [], answered: false, selected: new Set(), timerId: null, deadline: 0 };
+            renderQuestion();
+        }
+
+        function fillMedia(box, item) {
+            if (isImageData(item.photo)) {
+                const img = new Image();
+                img.className = 'ppe-photo';
+                img.alt = '';
+                img.src = item.photo;
+                box.appendChild(img);
+                const v = viewOf(item);
+                styleFrame(box, v);
+                styleImg(img, v);
+            } else {
+                box.innerHTML = svgLibrary[item.iconKey] || svgLibrary.generic;
+            }
+        }
+
+        function renderQuestion() {
+            const q = game.qs[game.idx];
+            game.cur = q;
+            game.answered = false;
+            game.selected = new Set();
+            const modeInfo = MODES.find(m => m.id === q.type);
+            let prompt = '';
+            if (q.type === 'A') {
+                prompt = `<div class="g-media ppe-image-container" id="g-media"></div><div class="g-ask">這是哪一種個人防護裝備？</div>`;
+                game.speak = '';
+            } else if (q.type === 'B') {
+                game.speak = q.item.name;
+                prompt = `<button class="g-big-audio" data-g="speak">🔊</button><div class="g-ask">聽聽看，你聽到的是哪一種裝備？（可重複點擊再聽一次）</div>`;
+            } else if (q.type === 'C') {
+                game.speak = q.item.purpose;
+                prompt = `<div class="g-text">${esc(q.item.purpose)} <button class="mini-audio" data-g="speak" title="朗讀">🔊</button></div><div class="g-ask">哪一種裝備有這個用途？</div>`;
+            } else if (q.type === 'D') {
+                game.speak = q.blank.replace('_____', 'blank');
+                prompt = `<div class="g-text">${esc(q.blank)} <button class="mini-audio" data-g="speak" title="朗讀">🔊</button></div>
+                    <button class="g-hint-btn" data-g="hint">💡 看中文提示</button>
+                    <div class="g-hint" id="g-hint" style="display:none">${esc(q.item.exZh || '（這題沒有中文提示）')}</div>
+                    <div class="g-ask">空格中應該填入哪一種裝備？</div>`;
+            } else {
+                game.speak = q.wo.text;
+                prompt = `<div class="g-wo-title">${esc(q.wo.title)}</div>
+                    <div class="g-text">${esc(q.wo.text)} <button class="mini-audio" data-g="speak" title="朗讀">🔊</button></div>
+                    ${q.wo.textZh ? '<button class="g-hint-btn" data-g="hint">🈶 顯示中文</button><div class="g-hint" id="g-hint" style="display:none">' + esc(q.wo.textZh) + '</div>' : ''}
+                    <div class="g-ask">這項任務需要哪些專業防護裝備？（可複選，選完按「送出答案」）</div>`;
+            }
+            const opts = q.options.map((o, i) =>
+                `<button class="game-opt" data-g="opt" data-i="${i}">${esc(o.label)}</button>`).join('');
+            gameRoot.innerHTML = `
+                <div class="g-bar">
+                    <span>${modeInfo.icon} 第 ${game.idx + 1} / ${game.qs.length} 題</span>
+                    <span>分數 <b id="g-score">${game.score}</b></span>
+                    <span id="g-combo">${game.combo > 1 ? '🔥 連擊 ' + game.combo : ''}</span>
+                    <button class="g-quit" data-g="quit">離開</button>
+                </div>
+                ${gameCfg.timer ? '<div class="g-timer"><div id="g-timer-fill"></div></div>' : ''}
+                <div class="g-card">
+                    ${prompt}
+                    <div class="g-options ${q.kind === 'multi' ? 'multi' : ''}">${opts}</div>
+                    ${q.kind === 'multi' ? '<button class="tool-btn primary g-submit" data-g="submit">送出答案</button>' : ''}
+                    <div id="g-feedback"></div>
+                </div>`;
+            if (q.type === 'A') fillMedia($('g-media'), q.item);
+            if (q.type === 'B') playAudio(game.speak);
+            startTimer(q.timeLimit);
+        }
+
+        function startTimer(limit) {
+            clearInterval(game.timerId);
+            if (!gameCfg.timer) return;
+            game.limit = limit;
+            game.deadline = Date.now() + limit * 1000;
+            const fill = $('g-timer-fill');
+            game.timerId = setInterval(() => {
+                const left = game.deadline - Date.now();
+                if (fill) {
+                    fill.style.width = Math.max(0, left / (limit * 10)) + '%';
+                    fill.classList.toggle('low', left < limit * 300);
+                }
+                if (left <= 0) { clearInterval(game.timerId); submitAnswer(true); }
+            }, 100);
+        }
+
+        // ---- 作答與評分 ----
+        function submitAnswer(timeout) {
+            if (!game || game.answered) return;
+            game.answered = true;
+            clearInterval(game.timerId);
+            const q = game.cur;
+            const correctIdx = q.options.map((o, i) => o.correct ? i : -1).filter(i => i >= 0);
+            const picked = [...game.selected];
+            const ok = !timeout && picked.length > 0 && picked.length === correctIdx.length && picked.every(i => q.options[i].correct);
+
+            let points = 0;
+            if (ok) {
+                game.combo++;
+                game.bestCombo = Math.max(game.bestCombo, game.combo);
+                points = 10 + Math.min(game.combo - 1, 5) * 2;
+                if (gameCfg.timer) points += Math.max(0, Math.ceil((game.deadline - Date.now()) / 1000 / 3));
+                game.right++;
+            } else {
+                game.combo = 0;
+                game.wrong.push(q);
+            }
+            game.score += points;
+
+            document.querySelectorAll('.game-opt').forEach((btn, i) => {
+                btn.disabled = true;
+                if (q.options[i].correct) btn.classList.add('correct');
+                else if (game.selected.has(i)) btn.classList.add('wrong');
+            });
+            $('g-score').textContent = game.score;
+            $('g-combo').textContent = game.combo > 1 ? '🔥 連擊 ' + game.combo : '';
+            const sub = gameRoot.querySelector('.g-submit');
+            if (sub) sub.style.display = 'none';
+
+            let detail = '';
+            if (q.kind === 'single') {
+                const it = q.item;
+                detail = `<div class="fb-info">
+                    <div><b>${esc(it.name)}</b> <button class="mini-audio" data-g="speak-name">🔊</button></div>
+                    <div>${esc(it.purpose)} <button class="mini-audio" data-g="speak-purpose">🔊</button></div>
+                    ${it.ex ? `<div class="fb-ex">例句：${esc(it.ex)} <button class="mini-audio" data-g="speak-ex">🔊</button>${it.exZh ? '<div class="ex-zh">' + esc(it.exZh) + '</div>' : ''}</div>` : ''}
+                </div>`;
+            } else {
+                detail = `<div class="fb-info"><b>正確答案：</b><div class="ex-en">${esc(q.wo.ans).replace(/\n/g, '<br>')}</div></div>`;
+            }
+            const head = timeout && !picked.length ? '⏰ 時間到！' : ok ? `✅ 答對了！ +${points} 分` : '❌ 答錯了，再記一次！';
+            $('g-feedback').innerHTML = `<div class="fb ${ok ? 'ok' : 'bad'}">${head}</div>${detail}
+                <button class="tool-btn primary g-next" data-g="next">${game.idx + 1 >= game.qs.length ? '查看成績 🏁' : '下一題 ➜'}</button>`;
+            $('g-feedback').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+        function nextQuestion() {
+            game.idx++;
+            if (game.idx >= game.qs.length) finishGame(); else renderQuestion();
+        }
+
+        function finishGame() {
+            clearInterval(game.timerId);
+            const total = game.qs.length;
+            const pct = Math.round(game.right / total * 100);
+            const stars = pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 40 ? 1 : 0;
+            const isNew = game.score > (highs[game.mode] || 0);
+            if (isNew) { highs[game.mode] = game.score; saveHighs(); }
+            const msg = ['再接再厲，多看幾次裝備庫吧！', '不錯的開始，繼續練習！', '很棒！你已經很熟悉了！', '太厲害了！你是 PPE 專家！'][stars];
+            const wrongList = game.wrong.map(q => q.kind === 'single'
+                ? `<li><b>${esc(q.item.name)}</b>：${esc(q.item.purpose)}</li>`
+                : `<li><b>${esc(q.wo.title)}</b>：${esc(q.wo.ans)}</li>`).join('');
+            gameRoot.innerHTML = `
+                <div class="g-card result">
+                    <div class="stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+                    <h3>${msg}</h3>
+                    <div class="result-score">${game.score} 分</div>
+                    ${isNew ? '<div class="new-best">🎉 新的最高分！</div>' : ''}
+                    <p>答對 ${game.right} / ${total} 題（${pct}%）　最高連擊 ${game.bestCombo}</p>
+                    ${wrongList ? `<div class="wrong-box"><b>需要複習的項目：</b><ul>${wrongList}</ul></div>` : '<p>🎊 全部答對，沒有需要複習的項目！</p>'}
+                    <div class="result-actions">
+                        <button class="tool-btn primary" data-g="again">🔁 再玩一次</button>
+                        <button class="tool-btn" data-g="menu">🏠 回主選單</button>
+                    </div>
+                </div>`;
+        }
+
+        // ---- 事件 ----
+        gameRoot.addEventListener('click', e => {
+            const btn = e.target.closest('[data-g]');
+            if (!btn) return;
+            const act = btn.dataset.g;
+            if (act === 'start') startGame(btn.dataset.mode);
+            else if (act === 'menu' || act === 'quit') showMenu();
+            else if (act === 'again') startGame(game.mode);
+            else if (act === 'speak') playAudio(game.speak);
+            else if (act === 'speak-name') playAudio(game.cur.item.name);
+            else if (act === 'speak-purpose') playAudio(game.cur.item.purpose);
+            else if (act === 'speak-ex') playAudio(game.cur.item.ex);
+            else if (act === 'hint') {
+                const h = $('g-hint');
+                h.style.display = h.style.display === 'none' ? 'block' : 'none';
+            } else if (act === 'opt') {
+                if (game.answered) return;
+                const i = parseInt(btn.dataset.i, 10);
+                if (game.cur.kind === 'single') {
+                    game.selected = new Set([i]);
+                    submitAnswer(false);
+                } else {
+                    if (game.selected.has(i)) game.selected.delete(i); else game.selected.add(i);
+                    btn.classList.toggle('selected', game.selected.has(i));
+                }
+            } else if (act === 'submit') {
+                if (!game.selected.size) { toast('請至少選擇一個答案', true); return; }
+                submitAnswer(false);
+            } else if (act === 'next') nextQuestion();
+        });
+
+        showMenu();
+    </script>
+</body>
+</html>
