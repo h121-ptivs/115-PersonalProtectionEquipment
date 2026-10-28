@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>適航大進擊：飛機維修個人防護裝備(PPE)與維修工單互動訓練系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e3a8a',
+                            900: '#0f172a',
+                        },
+                        sky: {
+                            600: '#0284c7',
+                        },
+                        emerald: {
+                            600: '#10b981',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', 'Microsoft JhengHei', sans-serif;
+        }
+        .ppe-icon-svg {
+            width: 72px;
+            height: 72px;
+            fill: #0284c7;
+            transition: transform 0.2s ease;
+        }
+        .ppe-card:hover .ppe-icon-svg {
+            transform: scale(1.1);
+        }
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 bg-slate-50 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-navy-800 via-indigo-900 to-sky-700 text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-center md:text-left">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2 justify-center md:justify-start">
+                    <span>✈️</span> 適航大進擊：飛機維修 PPE 與工單訓練系統
+                </h1>
+                <p class="text-sky-200 text-xs sm:text-sm mt-1">Airworthiness Rush: Interactive Maintenance PPE & Work Order System</p>
+            </div>
+            
+            <!-- Voice Selector -->
+            <div class="flex items-center bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/20 text-xs sm:text-sm">
+                <label for="voice-select" class="mr-2 whitespace-nowrap text-sky-100 flex items-center gap-1">
+                    <span>🔊</span> 語音人聲:
+                </label>
+                <select id="voice-select" class="bg-navy-800 text-white rounded px-2 py-1 border border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300 max-w-[200px] truncate">
+                    <option value="">載入語音中...</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Controls Bar -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-6 flex flex-col lg:flex-row justify-between items-center gap-4">
+            
+            <!-- Navigation Tabs -->
+            <div class="flex bg-slate-100 p-1 rounded-xl w-full lg:w-auto">
+                <button id="btn-ppe" onclick="switchTab('page-ppe')" class="flex-1 lg:flex-none px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-navy-800 text-white shadow-md">
+                    <span>🛡️</span> PPE 裝備庫 (<span id="count-ppe">0</span>)
+                </button>
+                <button id="btn-wo" onclick="switchTab('page-wo')" class="flex-1 lg:flex-none px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900">
+                    <span>📋</span> 維修工單任務 (<span id="count-wo">0</span>)
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative w-full lg:w-80">
+                <input type="text" id="search-input" oninput="handleSearch()" placeholder="搜尋關鍵字 (EN / 繁中...)" 
+                    class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-600 focus:bg-white transition-all">
+                <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                <button id="add-btn" onclick="handleOpenAddModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-sm transition-all flex items-center gap-1.5 whitespace-nowrap">
+                    <span>➕</span> <span id="add-btn-label">新增 PPE 裝備</span>
+                </button>
+                <button onclick="promptResetDefaults()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-medium transition-all flex items-center gap-1 whitespace-nowrap" title="重設為原廠預設資料">
+                    <span>🔄</span> 恢復預設
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 1: PPE Grid Page -->
+        <div id="page-ppe" class="space-y-6">
+            <div id="ppe-empty-state" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200">
+                <span class="text-5xl block mb-3">🔍</span>
+                <p class="text-slate-500 font-medium">未找到符合條件的 PPE 裝備卡片</p>
+            </div>
+            <div id="ppe-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- PPE Cards dynamically injected here -->
+            </div>
+        </div>
+
+        <!-- Tab 2: Work Orders Page -->
+        <div id="page-wo" class="hidden space-y-6">
+            <div id="wo-empty-state" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200">
+                <span class="text-5xl block mb-3">📋</span>
+                <p class="text-slate-500 font-medium">未找到符合條件的維修工單任務</p>
+            </div>
+            <div id="wo-container" class="max-w-4xl mx-auto space-y-5">
+                <!-- WO Cards dynamically injected here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- PPE Modal (Add / Edit) -->
+    <div id="ppe-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden transform transition-all max-h-[90vh] flex flex-col">
+            <div class="bg-navy-800 text-white px-6 py-4 flex justify-between items-center shrink-0">
+                <h3 id="ppe-modal-title" class="font-bold text-lg flex items-center gap-2">
+                    <span>🛡️</span> 編輯 PPE 個人防護裝備
+                </h3>
+                <button onclick="closePPEModal()" class="text-slate-300 hover:text-white text-xl font-bold px-2">&times;</button>
+            </div>
+            <form id="ppe-form" onsubmit="savePPEForm(event)" class="p-6 space-y-4 overflow-y-auto flex-1">
+                <input type="hidden" id="ppe-form-id">
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">裝備名稱 (Equipment Name):</label>
+                    <input type="text" id="ppe-form-name" required placeholder="例如: Reflective Vest" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-600">
+                </div>
+
+                <!-- Image Source Selection -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">圖示/照片類型 (Image Source):</label>
+                    <div class="grid grid-cols-2 gap-3 mb-2">
+                        <label class="flex items-center gap-2 border border-slate-200 p-2.5 rounded-lg cursor-pointer hover:bg-slate-50 transition-all">
+                            <input type="radio" name="image-type" value="icon" id="img-type-icon" checked onchange="toggleImageTypeUI()" class="text-sky-600 focus:ring-sky-500">
+                            <span class="text-xs font-semibold text-slate-700">預設向量圖示</span>
+                        </label>
+                        <label class="flex items-center gap-2 border border-slate-200 p-2.5 rounded-lg cursor-pointer hover:bg-slate-50 transition-all">
+                            <input type="radio" name="image-type" value="photo" id="img-type-photo" onchange="toggleImageTypeUI()" class="text-sky-600 focus:ring-sky-500">
+                            <span class="text-xs font-semibold text-slate-700">📷 自訂上傳照片</span>
+                        </label>
+                    </div>
+
+                    <!-- Preset Icon Option -->
+                    <div id="icon-select-container">
+                        <select id="ppe-form-icon" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-600 bg-white">
+                            <option value="vest">🎽 背心 / 衣物 (Vest / Clothing)</option>
+                            <option value="boots">🥾 安全鞋 / 靴子 (Boots / Shoes)</option>
+                            <option value="glasses">🥽 護目鏡 / 面罩 (Glasses / Face Shield)</option>
+                            <option value="earmuffs">🎧 防音耳罩 / 耳塞 (Ear Protection)</option>
+                            <option value="helmet">🪖 安全帽 / 防撞帽 (Helmets / Caps)</option>
+                            <option value="gloves">🧤 防護手套 (Gloves)</option>
+                            <option value="mask">😷 面罩 / 呼吸器 (Masks / Respirators)</option>
+                            <option value="tools">🔧 工具 / 儀器設備 (Tools / Meters)</option>
+                            <option value="harness">🦺 全身安全帶 / 防墜繩 (Harness / Lanyards)</option>
+                        </select>
+                    </div>
+
+                    <!-- Custom Photo Upload Option -->
+                    <div id="photo-upload-container" class="hidden space-y-3">
+                        <div class="border border-dashed border-sky-300 bg-sky-50/50 p-3 rounded-xl">
+                            <label class="block text-xs font-bold text-sky-800 mb-1">選擇照片檔案 (Select Photo):</label>
+                            <input type="file" id="ppe-form-file" accept="image/*" onchange="handleImageFileSelect(event)" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-700 cursor-pointer">
+                        </div>
+                        
+                        <!-- Photo Fit Mode & Zoom Controls -->
+                        <div id="photo-controls-box" class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-slate-700 flex items-center gap-1">🖼️ 照片圖框尺寸與顯示模式 (Fit Settings):</span>
+                                <button type="button" onclick="resetPhotoFrameControls()" class="px-2 py-0.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-[11px] font-semibold transition-all">重設模式</button>
+                            </div>
+                            
+                            <!-- Fit Mode Selector -->
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" id="fit-btn-contain" onclick="setFitMode('contain')" class="py-1.5 px-2 rounded-lg border border-sky-600 bg-sky-50 text-sky-800 font-bold text-xs transition-all text-center">
+                                    全照片顯示 (Contain)
+                                </button>
+                                <button type="button" id="fit-btn-cover" onclick="setFitMode('cover')" class="py-1.5 px-2 rounded-lg border border-slate-300 bg-white text-slate-700 font-semibold text-xs transition-all text-center">
+                                    填滿圖框 (Cover)
+                                </button>
+                                <button type="button" id="fit-btn-custom" onclick="setFitMode('custom')" class="py-1.5 px-2 rounded-lg border border-slate-300 bg-white text-slate-700 font-semibold text-xs transition-all text-center">
+                                    自訂縮放 (Custom)
+                                </button>
+                            </div>
+
+                            <!-- Custom Scaling Sliders (Visible when fitMode === 'custom') -->
+                            <div id="custom-slider-box" class="space-y-2 pt-1 border-t border-slate-200 hidden">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-slate-600 mb-0.5">縮放比例 (Zoom): <span id="scale-val" class="font-bold text-sky-700">100%</span></label>
+                                        <input type="range" id="ppe-form-scale" min="50" max="300" value="100" oninput="updateImagePreview()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-slate-600 mb-0.5">水平偏移 (X 軸): <span id="offset-x-val" class="font-bold text-sky-700">0px</span></label>
+                                        <input type="range" id="ppe-form-offset-x" min="-150" max="150" value="0" oninput="updateImagePreview()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-slate-600 mb-0.5">垂直偏移 (Y 軸): <span id="offset-y-val" class="font-bold text-sky-700">0px</span></label>
+                                        <input type="range" id="ppe-form-offset-y" min="-150" max="150" value="0" oninput="updateImagePreview()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image Preview Area (Fixed 180px / h-44 height) -->
+                    <div class="mt-3 border border-slate-300 rounded-xl bg-slate-900 h-44 flex items-center justify-center overflow-hidden relative shadow-inner">
+                        <span class="text-[11px] font-bold text-white/90 absolute top-2 left-2 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded shadow z-10">圖框 180px 即時預覽</span>
+                        <div id="image-preview-box" class="w-full h-full flex items-center justify-center">
+                            <!-- Live image or SVG preview -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purpose EN & ZH -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">功能用途 🇺🇸 (Purpose - English):</label>
+                        <textarea id="ppe-form-purpose-en" rows="3" required placeholder="Enhances visual awareness..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-600"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">功能用途 🇹🇼 (用途 - 繁體中文):</label>
+                        <textarea id="ppe-form-purpose-zh" rows="3" required placeholder="提高作業人員於機坪..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-600"></textarea>
+                    </div>
+                </div>
+
+                <!-- Scenario EN & ZH -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">應用場景 🇺🇸 (Scenario - English):</label>
+                        <textarea id="ppe-form-scenario-en" rows="3" required placeholder="Mandatory for all ramp operations..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-600"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">應用場景 🇹🇼 (使用場景 - 繁體中文):</label>
+                        <textarea id="ppe-form-scenario-zh" rows="3" required placeholder="所有機坪作業（不分晝夜）強制穿著..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-600"></textarea>
+                    </div>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-3 border-t border-slate-100">
+                    <button type="button" onclick="closePPEModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 text-sm font-semibold">取消</button>
+                    <button type="submit" class="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-sm font-semibold shadow-sm">儲存變更</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Work Order Modal (Add / Edit) -->
+    <div id="wo-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all">
+            <div class="bg-navy-800 text-white px-6 py-4 flex justify-between items-center">
+                <h3 id="wo-modal-title" class="font-bold text-lg flex items-center gap-2">
+                    <span>📋</span> 編輯維修工單任務
+                </h3>
+                <button onclick="closeWOModal()" class="text-slate-300 hover:text-white text-xl font-bold px-2">&times;</button>
+            </div>
+            <form id="wo-form" onsubmit="saveWOForm(event)" class="p-6 space-y-4">
+                <input type="hidden" id="wo-form-id">
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">工單編號與標題 (Title):</label>
+                    <input type="text" id="wo-form-title" required placeholder="例如: WO-21: Engine Inspection" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-600">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">維修作業情境說明 (Task Description):</label>
+                    <textarea id="wo-form-text" rows="3" required placeholder="詳細說明作業地點、氣候條件與實施之維修項目..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-600"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">建議標準防護裝備 (Recommended PPE Answer):</label>
+                    <textarea id="wo-form-ans" rows="3" required placeholder="例如: Raincoat (雨衣), Chemical-resistant gloves (防化學手套)..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-600"></textarea>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-3 border-t border-slate-100">
+                    <button type="button" onclick="closeWOModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 text-sm font-semibold">取消</button>
+                    <button type="submit" class="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-sm font-semibold shadow-sm">儲存變更</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog Modal -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+            <div id="confirm-icon" class="text-4xl mb-3">⚠</div>
+            <h4 id="confirm-title" class="text-lg font-bold text-slate-800 mb-2">確定執行此動作？</h4>
+            <p id="confirm-msg" class="text-sm text-slate-600 mb-6">此操作無法復原，請確認是否繼續。</p>
+            <div class="flex justify-center gap-3">
+                <button id="confirm-cancel-btn" onclick="closeConfirmModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-all">取消</button>
+                <button id="confirm-action-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold shadow-sm transition-all">確定刪除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700">
+        <span id="toast-icon">✨</span>
+        <span id="toast-msg" class="text-sm font-medium">訊息通知</span>
+    </div>
+
+    <script>
+        // SVG Library for Default PPE Icons
+        const svgLibrary = {
+            vest: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.42 10.16 8 11.42 4.58-1.26 8-6.17 8-11.42V6l-8-4zm-1 15h2v2h-2v-2zm0-8h2v5h-2V9z"/></svg>`,
+            boots: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M20.5 15l-3.5-3V4c0-.55-.45-1-1-1h-6c-.55 0-1 .45-1 1v12H4c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-4c0-.28-.11-.53-.3-.7z"/></svg>`,
+            glasses: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M21 7.5c-.83 0-1.5.67-1.5 1.5H19c0-1.38-1.13-2.5-2.5-2.5S14 7.62 14 9h-4c0-1.38-1.13-2.5-2.5-2.5S5 7.62 5 9h-.5c0-.83-.67-1.5-1.5-1.5S1.5 8.17 1.5 9v3c0 2.21 1.79 4 4 4H7c1.86 0 3.41-1.28 3.86-3h2.28c.45 1.72 2 3 3.86 3h1.5c2.21 0 4-1.79 4-4V9c0-.83-.67-1.5-1.5-1.5z"/></svg>`,
+            earmuffs: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 2c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-2c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/></svg>`,
+            helmet: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.17 19.64 10.53 20 12 20s2.83-.36 4.34-1.09l1.9 1.9c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.62-1.79C19.26 16.07 20 14.12 20 12c0-4.97-4.03-9-9-9z"/></svg>`,
+            gloves: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M19 10c-.55 0-1 .45-1 1v4h-1V7c0-.55-.45-1-1-1s-1 .45-1 1v8h-1V5c0-.55-.45-1-1-1s-1 .45-1 1v10h-1V8c0-.55-.45-1-1-1s-1 .45-1 1v8.5c0 .28.22.5.5.5s.5-.22.5-.5V14h1v3.5c0 2.48 2.02 4.5 4.5 4.5h3c2.48 0 4.5-2.02 4.5-4.5V11c0-.55-.45-1-1-1z"/></svg>`,
+            mask: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 12 10 10-4.48 10-12S17.52 2 12 2zm1 15.5h-2v-2h-2v-2h6v2h-2v2zm3.5-6.5h-7v-2h7v2z"/></svg>`,
+            tools: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L7.8 4.8 4.8 7.8 1.7 4.7C.6 7.1 1 10.1 3 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.4-.4.4-1.1 0-1.4z"/></svg>`,
+            harness: `<svg class="ppe-icon-svg" viewBox="0 0 24 24"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm4 9V8c0-2.21-1.79-4-4-4S8 5.79 8 8v3c-1.66 0-3 1.34-3 3v6h3v-4h2v4h4v-4h2v4h3v-6c0-1.66-1.34-3-3-3z"/></svg>`
+        };
+
+        // 照片檔名對照表（與裝備英文名稱一致，副檔名 .png）
+        const PHOTO_FILE_MAP = {
+            "Reflective Vest": "Reflective Vest.png",
+            "Steel-toe Safety Boots": "Steel-toe Safety Boots.png",
+            "Safety Glasses": "Safety Glasses.png",
+            "Chemical Splash Goggles": "Chemical Splash Goggles.png",
+            "Face Shield": "Face Shield.png",
+            "Ear Muffs": "Ear Muffs.png",
+            "Ear Plugs": "Ear Plugs.png",
+            "Bump Cap": "Bump Cap.png",
+            "Safety Helmet (with chin strap)": "Safety Helmet (with chin strap).png",
+            "Nitrile Chemical Gloves": "Nitrile Chemical Gloves.png",
+            "Heavy-duty Leather Gloves": "Heavy-duty Leather Gloves.png",
+            "Heat-resistant Gloves": "Heat-resistant Gloves.png",
+            "Anti-static Wrist Strap": "Anti-static Wrist Strap.png",
+            "Insulated Rubber Gloves": "Insulated Rubber Gloves.png",
+            "Full-body Safety Harness": "Full-body Safety Harness.png",
+            "Lanyard with Shock Absorber": "Lanyard with Shock Absorber.png",
+            "Dust Mask (N95/Particulate)": "Dust Mask (N95-Particulate).png",
+            "Air-purifying Respirator (Gas Mask)": "Air-purifying Respirator (Gas Mask).png",
+            "Self-Contained Breathing Apparatus (SCBA)": "Self-Contained Breathing Apparatus (SCBA).png",
+            "Anti-static Coveralls": "Anti-static Coveralls.png",
+            "Disposable Tyvek Coveralls": "Disposable Tyvek Coveralls.png",
+            "Chemical-resistant Apron": "Chemical-resistant Apron.png",
+            "Anti-slip Winter Boots": "Anti-slip Winter Boots.png",
+            "Knee Pads": "Knee Pads.png",
+            "Welding Face Shield": "Welding Face Shield.png",
+            "Cryogenic Gloves": "Cryogenic Gloves.png",
+            "Lighted Marshalling Wands": "Lighted Marshalling Wands.png",
+            "Gas Detector": "Gas Detector.png",
+            "Flashlight / Headlamp": "Flashlight - Headlamp.png",
+            "Raincoat (High-Visibility)": "Raincoat (High-Visibility).png",
+            "Insulated Winter Jacket": "Insulated Winter Jacket.png",
+            "Waterproof Long Rubber Gloves": "Waterproof Long Rubber Gloves.png"
+        };
+
+        // Complete 32 PPE Items Dataset
+        const DEFAULT_PPE_BASE = [
+            { id: "ppe_1", name: "Reflective Vest", purposeEn: "Enhances visual awareness of personnel on the active ramp, taxiway, or hangar floor.", purposeZh: "提高作業人員於機坪、滑行道或修護棚廠內的視覺能見度與辨識度。", scenarioEn: "Mandatory for all ramp operations, day and night, to prevent aircraft ground collision accidents.", scenarioZh: "所有機坪作業（不分晝夜）強制穿著，避免遭航機或地面支援裝備撞擊。", iconType: "icon", icon: "vest", fitMode: "contain" },
+            { id: "ppe_2", name: "Steel-toe Safety Boots", purposeEn: "Protects feet from crushing injuries, sharp punctures, and heavy falling materials.", purposeZh: "保護腳部免受重物壓傷、尖銳物刺穿及高空墜落物件砸傷。", scenarioEn: "Mandatory baseline footwear for entering any aircraft maintenance zones.", scenarioZh: "進入任何飛機維修區域（機坪、棚廠、工場）之基礎強制防護安全鞋。", iconType: "icon", icon: "boots", fitMode: "contain" },
+            { id: "ppe_3", name: "Safety Glasses", purposeEn: "Protects eyes from flying debris, foreign object debris (FOD), dust, and structural metallic fragments.", purposeZh: "保護眼睛免受飛濺碎屑、外物（FOD）、粉塵及金屬鑽孔切削屑傷害。", scenarioEn: "Worn during drilling, cutting lockwires, grinding, or general mechanical component assembly.", scenarioZh: "執行鑽孔、剪切保險絲、打磨金屬或一般機械組件拆裝作業時佩戴。", iconType: "icon", icon: "glasses", fitMode: "contain" },
+            { id: "ppe_4", name: "Chemical Splash Goggles", purposeEn: "Provides a secure fluid-tight peripheral seal around the eyes against airborne chemical mist or splashes.", purposeZh: "提供眼部完全密合之液體屏障，防止航空化學品霧滴或強烈液體潑濺。", scenarioEn: "Mandatory when servicing Skydrol hydraulic fluid, engine turbine oil, or aircraft fuel.", scenarioZh: "執行 Skydrol 航空液壓油、發動機機油或航空燃油系統補充時強制佩戴。", iconType: "icon", icon: "glasses", fitMode: "contain" },
+            { id: "ppe_5", name: "Face Shield", purposeEn: "Offers full-face coverage from heavy chemical splashes, high-pressure fluid leaks, and flying particles.", purposeZh: "提供全臉部全面防護，阻擋強烈化學品液體噴濺、高壓液體洩漏與飛濺顆粒。", scenarioEn: "Used during aircraft battery replacements, servicing high-pressure lines, or handling bulk solvents.", scenarioZh: "執行主電池拆裝、高壓管路維修作業或調配大容量溶劑時配戴。", iconType: "icon", icon: "glasses", fitMode: "contain" },
+            { id: "ppe_6", name: "Ear Muffs", purposeEn: "Provides maximum acoustic insulation to block high-frequency, extreme decibel noise from running turbine engines.", purposeZh: "提供高分貝聲學隔音，有效阻絕渦輪發動機運轉時產生之極高分貝噪音。", scenarioEn: "Worn on active aprons during auxiliary power unit (APU) runs, engine test operations, or marshalling duties.", scenarioZh: "於機坪執行 APU 試車、發動機試車警戒或航機指揮引導（Marshalling）時佩戴。", iconType: "icon", icon: "earmuffs", fitMode: "contain" },
+            { id: "ppe_7", name: "Ear Plugs", purposeEn: "Inserts directly into the ear canal to attenuate moderate workplace ambient noise.", purposeZh: "直接塞入耳道內，衰減維修作業環境中之中等強度的持續性背景噪音。", scenarioEn: "Used for long-duration routine maintenance inside general hangar production environments.", scenarioZh: "於修護棚廠內執行長時間例行性維護、巡檢及組裝作業時使用。", iconType: "icon", icon: "earmuffs", fitMode: "contain" },
+            { id: "ppe_8", name: "Bump Cap", purposeEn: "Protects the skull from minor lacerations, bumps, and scrapes in low-overhead, confined environments.", purposeZh: "保護頭部免於在低矮空間或狹窄結構中碰撞硬物造成割傷與擦傷。", scenarioEn: "Worn during inspections inside the electronics bay (E-E bay), cargo compartments, or wheel wells.", scenarioZh: "於電子艙（E-E Bay）、貨艙內部或起落架艙（Wheel Well）進行檢查作業時佩戴。", iconType: "icon", icon: "helmet", fitMode: "contain" },
+            { id: "ppe_9", name: "Safety Helmet", purposeEn: "Provides heavy impact defense for the head and remains secure to the skull during accidental falls.", purposeZh: "提供頭部高強度撞擊保護，並於意外跌落時透過下巴帶穩固於頭部不致脫落。", scenarioEn: "Mandatory when working on high-access stands, cherry pickers (scissor lifts), or top fuselage tasks.", scenarioZh: "於高空作業平台、剪式升降車或機身頂部執行維修任務時強制配戴。", iconType: "icon", icon: "helmet", fitMode: "contain" },
+            { id: "ppe_10", name: "Nitrile Chemical Gloves", purposeEn: "Resists aggressive aviation chemicals, lubricating fluid, oils, and highly toxic fluids.", purposeZh: "抗航空化學溶劑、潤滑油、機油及具毒性之液體，保護手部皮膚。", scenarioEn: "Worn during routine flight-line oil checks, fluid top-ups, and component wipe-down inspections.", scenarioZh: "執行例行航線機油檢查、補充航空液體及組裝件擦拭清潔時佩戴。", iconType: "icon", icon: "gloves", fitMode: "contain" },
+            { id: "ppe_11", name: "Heavy-duty Leather Gloves", purposeEn: "Provides robust skin shield against cuts, punctures, abrasive rough surfaces, and high friction.", purposeZh: "提供手部防割撕裂、防刺穿、耐磨損及抗摩擦之高強度防護。", scenarioEn: "Worn during aircraft main wheel assembly replacements, brake swaps, and heavy structural panel work.", scenarioZh: "執行飛機主輪組替換、煞車組更換及大型結構鈑金搬運與施工時佩戴。", iconType: "icon", icon: "gloves", fitMode: "contain" },
+            { id: "ppe_12", name: "Heat-resistant Gloves", purposeEn: "Insulates hands from severe thermal burns when handling hot components or running components.", purposeZh: "阻絕高溫傳導，防止手部在接觸剛運轉完畢之高溫組件時遭受嚴重燙傷。", scenarioEn: "Worn during immediate post-arrival inspections near the hot engine exhaust nozzle or brake drums.", scenarioZh: "於航機降落後立即執行過境檢查，靠近發動機尾噴口或高溫煞車盤時佩戴。", iconType: "icon", icon: "gloves", fitMode: "contain" },
+            { id: "ppe_13", name: "Anti-static Wrist Strap", purposeEn: "Channels electrostatic charges away from the body to ground, preventing Electrostatic Discharge (ESD) damage.", purposeZh: "將人體靜電安全導引至接地端，防止靜電放電（ESD）擊穿敏感電子元件。", scenarioEn: "Mandatory whenever handling flight control computers, avionics cards, or navigation radar hardware.", scenarioZh: "接觸飛控電腦、航電介面卡或導航雷達硬體模組時強制佩戴。", iconType: "icon", icon: "tools", fitMode: "contain" },
+            { id: "ppe_14", name: "Insulated Rubber Gloves", purposeEn: "Provides certified dielectric insulation to protect technicians against high-voltage electrical arcs.", purposeZh: "提供高規格介電絕緣防護，防止技術人員在接觸高壓電路時遭受電擊或電弧灼傷。", scenarioEn: "Used during electrical power system diagnostics, troubleshooting live circuits, or connecting external power carts.", scenarioZh: "執行主電源系統檢修、帶電線路查線及連接地面外接電源車（GPU）時使用。", iconType: "icon", icon: "gloves", fitMode: "contain" },
+            { id: "ppe_15", name: "Full-body Safety Harness", purposeEn: "Distributes dynamic forces and safely arrests falls from dangerous heights to prevent critical trauma.", purposeZh: "平均分散高空墜落衝擊力，安全減速並停止墜落，防止高處墜落致命傷害。", scenarioEn: "Mandatory for tasks on the aircraft upper wings, vertical stabilizer, or top-center fuselage areas.", scenarioZh: "於飛機主翼上表面、垂直尾翼高處或機身頂部執行作業時強制穿著並掛扣。", iconType: "icon", icon: "harness", fitMode: "contain" },
+            { id: "ppe_16", name: "Lanyard with Shock Absorber", purposeEn: "Connects the safety harness securely to a structural life-line or anchor point while breaking momentum during a fall.", purposeZh: "連接安全帶與母索固定點，於墜落時透過撕裂式衝擊吸收器降低身體受力。", scenarioEn: "Must always be paired with the safety harness during any open, elevated maintenance work.", scenarioZh: "所有高空維修作業中，必須與全身式安全帶配合掛扣於核可之救生母索上。", iconType: "icon", icon: "harness", fitMode: "contain" },
+            { id: "ppe_17", name: "Dust Mask", purposeEn: "Filters dangerous airborne particulate matter, dust fibers, and microscopic elements from entering lungs.", purposeZh: "過濾空氣中之有害懸浮微粒、粉塵、玻璃纖維及微小顆粒，保護呼吸道。", scenarioEn: "Worn when cleaning main landing gear assemblies heavily coated with toxic carbon brake dust.", scenarioZh: "清潔沾滿有毒煞車碳粉塵之主起落架組件或研磨複合材料時佩戴。", iconType: "icon", icon: "mask", fitMode: "contain" },
+            { id: "ppe_18", name: "Air-purifying Respirator", purposeEn: "Neutralizes toxic gaseous chemical fumes, dangerous organic vapors, and heavy paint vapors via chemical canisters.", purposeZh: "透過化學濾毒罐過濾有毒有機氣體、化學蒸氣及噴漆揮發物，防止中毒。", scenarioEn: "Mandatory during composite structure adhesive bonding, structural spray painting, or fuel line resealing.", scenarioZh: "執行複合材料膠合修復、機身局部補漆或燃油管路密封劑填補時強制佩戴。", iconType: "icon", icon: "mask", fitMode: "contain" },
+            { id: "ppe_19", name: "Self-Contained Breathing Apparatus", purposeEn: "Supplies self-contained, completely independent clean breathable air in oxygen-deficient or life-threatening environments.", purposeZh: "提供完全獨立之清潔可呼吸空氣，適用於缺氧或具生命立即危險（IDLH）之環境。", scenarioEn: "Utilized by specialized teams entering completely sealed, unventilated, high-hazard internal fuel tank deep cells.", scenarioZh: "專業團隊進入完全封閉、未充分通風之主油箱深處深層小艙室時佩戴。", iconType: "icon", icon: "mask", fitMode: "contain" },
+            { id: "ppe_20", name: "Anti-static Coveralls", purposeEn: "Constructed with specialized materials that prevent structural static spark discharge that could detonate fuel mist.", purposeZh: "採用防靜電導電纖維布料，防止摩擦產生靜電火花而引燃油氣。", scenarioEn: "Mandatory uniform for technical teams entering internal fuel cells or executing fuel tank component swaps.", scenarioZh: "技術人員進入油箱內部作業或執行油箱內組件拆裝時之強制標準工作服。", iconType: "icon", icon: "vest", fitMode: "contain" },
+            { id: "ppe_21", name: "Disposable Tyvek Coveralls", purposeEn: "Provides a full-body barrier to shield personal garments from sticky sealants, greasy grease, and wet lubricants.", purposeZh: "提供全身屏障，保護衣物免受黏稠密封膠、油脂、高黏度潤滑油污染。", scenarioEn: "Worn during heavy landing gear structural lubrication tasks or vacuum toilet system plumbing maintenance.", scenarioZh: "執行起落架大修重度潤滑黃油補充或真空廁所管路疏通維護時佩戴。", iconType: "icon", icon: "vest", fitMode: "contain" },
+            { id: "ppe_22", name: "Chemical-resistant Apron", purposeEn: "Provides robust, impermeable liquid protection for the torso against highly aggressive corrosive acids.", purposeZh: "為軀幹提供高強度抗酸鹼不透液屏障，防止強腐蝕性酸鹼液體侵蝕。", scenarioEn: "Worn when handling chemical vats or performing service maintenance inside the aircraft battery charging shop.", scenarioZh: "於飛機電瓶電解液充放電工場作業或調配強酸液體時穿著。", iconType: "icon", icon: "vest", fitMode: "contain" },
+            { id: "ppe_23", name: "Anti-slip Winter Boots", purposeEn: "Engineered with maximum traction compounds to prevent slipping on slick, wet, or ice-coated winter tarmac.", purposeZh: "特殊高抓地力防滑鞋底，防止於積雪、結冰或潮濕冰冷之機坪上滑倒。", scenarioEn: "Worn on the freezing flight line during severe winter operations and winter de-icing shifts.", scenarioZh: "於嚴冬機坪執行除冰防冰作業及寒冷天候航線維護時佩戴。", iconType: "icon", icon: "boots", fitMode: "contain" },
+            { id: "ppe_24", name: "Knee Pads", purposeEn: "Relieves excessive mechanical pressure and protects knees from bruising during prolonged kneeling.", purposeZh: "減緩膝關節壓迫壓力，防止長時間跪地維修造成膝蓋骨受傷或瘀青。", scenarioEn: "Used during extended passenger seat track repairs, electronics tray wiring, or floorboard installations.", scenarioZh: "執行客艙座椅軌道維修、地板下方線束排線或客艙地板鋪設時使用。", iconType: "icon", icon: "tools", fitMode: "contain" },
+            { id: "ppe_25", name: "Welding Face Shield", purposeEn: "Filters dangerous bright arcs, blocks intense infrared/ultraviolet light, and catches hot sparks.", purposeZh: "過濾有害強烈電弧光、阻隔紅外線與紫外線，並抵檔高溫焊接火花。", scenarioEn: "Worn by structural aviation metal repair technicians during hangar structural component welding operations.", scenarioZh: "結構維修技術人員於棚廠工場執行金屬鈑金氬焊或電焊作業時佩戴。", iconType: "icon", icon: "glasses", fitMode: "contain" },
+            { id: "ppe_26", name: "Cryogenic Gloves", purposeEn: "Provides specialized sub-zero thermal protection to guard skin from instant frostbite caused by supercooled items.", purposeZh: "提供超低溫防護，防止接觸極低溫液體或極冷物質時皮膚遭受瞬間凍傷。", scenarioEn: "Worn when replenishing the Liquid Oxygen (LOX) system or distributing structural dry ice packs.", scenarioZh: "執行液態氧（LOX）系統加注補充或處理低溫乾冰冷縮組裝時佩戴。", iconType: "icon", icon: "gloves", fitMode: "contain" },
+            { id: "ppe_27", name: "Lighted Marshalling Wands", purposeEn: "Emits highly noticeable illuminated signals to allow clear communications with the cockpit flight crew in low-light.", purposeZh: "發出鮮明高能見度光源訊號，於夜間或低能見度下向飛航組員發出明確指引。", scenarioEn: "Essential equipment utilized for guiding arriving or departing aircraft on the dark ramp during night shifts.", scenarioZh: "夜班時段於機坪引導進站或離站航機滑行時之必要指揮裝備。", iconType: "icon", icon: "tools", fitMode: "contain" },
+            { id: "ppe_28", name: "Gas Detector", purposeEn: "Constantly samples ambient atmosphere to alert against oxygen deficiency, flammable vapor build-ups, or toxic gas.", purposeZh: "即時連續監測環境氣體，針對缺氧、可燃氣體濃度過高及毒氣進行主動警報。", scenarioEn: "Used to clear and monitor internal spaces before and during a technician's entry into a fuel tank.", scenarioZh: "人員進入油箱等密閉空間前後，進行環境氣體安全量測與持續監控。", iconType: "icon", icon: "tools", fitMode: "contain" },
+            { id: "ppe_29", name: "Flashlight", purposeEn: "Delivers essential localized illumination into dark, complex structural compartments.", purposeZh: "提供高亮度局域照明，使人員能清晰檢查陰暗及複雜之飛機結構內部。", scenarioEn: "Used for overnight pre-flight airframe walk-around checks, tail-cone interior sweeps, and cargo liner inspections.", scenarioZh: "夜間過境機身巡檢、尾錐內部檢查及貨艙壁板例行查核時使用。", iconType: "icon", icon: "tools", fitMode: "contain" },
+            { id: "ppe_30", name: "Raincoat", purposeEn: "Provides water resistance while maximizing visibility for outdoor operations during severe weather.", purposeZh: "提供完全防水性能並保持高能見度，確保惡劣雨天作業時人身安全與乾燥。", scenarioEn: "Worn during routine flight-line transit checks, aircraft arrival servicing, or ramp fueling under heavy downpours.", scenarioZh: "大雨滂沱中執行外場航線過境檢查、迎機接機及機坪加油監督時佩戴。", iconType: "icon", icon: "vest", fitMode: "contain" },
+            { id: "ppe_31", name: "Insulated Winter Jacket", purposeEn: "Maintains optimal body core temperatures and physical dexterity in sub-zero winter temperatures.", purposeZh: "保持人體核心體溫與肢體靈敏度，防止於嚴寒極端天候中遭受失溫傷害。", scenarioEn: "Worn for outdoor line maintenance during deep-freeze arctic or winter seasonal flight operations.", scenarioZh: "於亞寒帶或嚴冬季節執行外場長時間戶外機務維修作業時穿著。", iconType: "icon", icon: "vest", fitMode: "contain" },
+            { id: "ppe_32", name: "Waterproof Long Rubber Gloves", purposeEn: "Provides full biohazard liquid protection stretching over the forearms.", purposeZh: "延伸至前臂之完全不透水防護，隔離生物危害液體與強效化學消毒劑。", scenarioEn: "Mandatory gear when servicing or unblocking the highly unsanitary aircraft vacuum toilet waste lines.", scenarioZh: "執行飛機真空廁所污水系統維護、排放及管路堵塞疏通時強制佩戴。", iconType: "icon", icon: "gloves", fitMode: "contain" }
+        ];
+
+        const DEFAULT_PPE = DEFAULT_PPE_BASE.map(item => {
+            const fileName = PHOTO_FILE_MAP[item.name];
+            return fileName
+                ? { ...item, iconType: "photo", photoData: fileName, fitMode: item.fitMode || "contain" }
+                : item;
+        });
+
+        // 20 Maintenance Work Orders Dataset
+        const DEFAULT_WO = [
+            { id: "wo_1", title: "WO-01: Apron Refueling in Heavy Rain", text: "Refueling the aircraft in heavy rain on the active apron.", ans: "Raincoat (雨衣), Chemical-resistant gloves (防化學手套), Safety glasses (護目鏡)." },
+            { id: "wo_2", title: "WO-02: Landing Gear Hydraulic Leak", text: "Checking a hydraulic leak in the Main Landing Gear (MLG) bay.", ans: "Chemical goggles (防化學護目鏡), Nitrile gloves (丁腈防化學手套), Bump cap/Safety helmet (工程帽/安全帽)." },
+            { id: "wo_3", title: "WO-03: IDG Generator Oil Top-up", text: "Servicing Engine 1 integrated drive generator (IDG) oil.", ans: "Heat-resistant/Chemical gloves (耐熱/防化學手套), Face shield (防護面罩)." },
+            { id: "wo_4", title: "WO-04: Overnight Fuel Tank Draining", text: "Draining water from the fuel tanks during the overnight check.", ans: "Chemical-resistant gloves (防化學手套), Safety glasses (護目鏡), Fuel-resistant apron (防油圍裙)." },
+            { id: "wo_5", title: "WO-05: Hot Summer Tire Replacement", text: "Replacing the Main Landing Gear (MLG) tire on a hot summer afternoon.", ans: "Heavy-duty work gloves (防護工作手套), Safety glasses (護目鏡), Sun hat/UV protection (防曬帽/防曬用品)." },
+            { id: "wo_6", title: "WO-06: Main Gear Brake Assembly Swap", text: "Replacing a worn brake assembly on the left main gear.", ans: "Heavy-duty work gloves (防護工作手套), Dust mask (防塵口罩/防煞車粉塵), Safety glasses (護目鏡)." },
+            { id: "wo_7", title: "WO-07: High-Altitude Tail Panel Repair", text: "Repairing a loose panel on the vertical stabilizer using a cherry picker (scissor lift).", ans: "Full-body safety harness (全身式安全帶), Lanyard with shock absorber (防墜緩衝拉繩), Safety helmet with chin strap (帶下巴帶的安全帽)." },
+            { id: "wo_8", title: "WO-08: Windshield Wiper Replacement", text: "Replacing windshield wiper blades while standing on a maintenance stand.", ans: "Safety helmet (安全帽), Safety glasses (護目鏡), Anti-slip work gloves (防滑工作手套)." },
+            { id: "wo_9", title: "WO-09: Weather Radar Troubleshooting", text: "Troubleshooting the Weather Radar system in the aircraft nose cone.", ans: "Anti-static wrist strap (防靜電手環), Insulated tools/gloves (絕緣工具/手套)." },
+            { id: "wo_10", title: "WO-10: Cockpit Heated Glass Replacement", text: "Replacing a cracked windshield heated glass in the cockpit.", ans: "Heavy-duty work gloves (防護工作手套), Safety glasses (護目鏡)." },
+            { id: "wo_11", title: "WO-11: Aircraft Main Battery Swap", text: "Removing and replacing the Main Aircraft Battery in the electronics bay (E-E bay).", ans: "Acid-resistant gloves (防酸手套), Face shield (防護面罩), Rubber apron (橡膠圍裙)." },
+            { id: "wo_12", title: "WO-12: Overnight Under-floor Wire Inspection", text: "Inspecting wire bundles under the cabin floor during the night shift.", ans: "Flashlight/Headlamp (手電筒/頭燈), Bump cap (防撞帽), Dust mask (防塵口罩)." },
+            { id: "wo_13", title: "WO-13: Immediate Post-Arrival Inspection", text: "Conducting a Post-Arrival Inspection right after the aircraft engines shut down.", ans: "Ear muffs/Ear plugs (防噪音耳罩/耳塞), Heat-resistant gloves (耐熱手套)." },
+            { id: "wo_14", title: "WO-14: Winter Blizzard Walk-around", text: "Performing a 360-degree Walk-around check during a severe winter blizzard.", ans: "Winter insulated jacket (防寒外套), Anti-slip boots (防滑鞋/冰爪), Anti-fog safety glasses (防霧護目鏡)." },
+            { id: "wo_15", title: "WO-15: Night Shift Aircraft Marshalling", text: "Marshalling an arriving aircraft into the gate during the night shift.", ans: "Lighted marshalling wands (發光引導棒), Ear muffs (防噪音耳罩)." },
+            { id: "wo_16", title: "WO-16: Apron Skydrol Chemical Spill Clean-up", text: "Cleaning a chemical spill (Skydrol hydraulic fluid) on the apron.", ans: "Chemical splash suit (防化學潑濺服), Nitrile gloves (丁腈手套), Chemical goggles (防化學護目鏡)." },
+            { id: "wo_17", title: "WO-17: Cargo Compartment Smoke Inspection", text: "Inspecting the Forward Cargo Compartment for an active smoke warning.", ans: "Full-face respirator/SCBA (全面罩呼吸器/空氣呼吸器), Flashlight (手電筒), Safety helmet (安全帽)." },
+            { id: "wo_18", title: "WO-18: Confined Space Fuel Tank Entry", text: "Performing an internal inspection of the horizontal stabilizer tank (Confined Space).", ans: "Air-purifying respirator (防毒面具), Anti-static coveralls (防靜電連身工作服), Gas detector (氣體偵測器)." },
+            { id: "wo_19", title: "WO-19: Passenger Seat Frame Repair", text: "Replacing a broken passenger seat frame in the cabin.", ans: "Work gloves (工作手套), Safety glasses (護目鏡)." },
+            { id: "wo_20", title: "WO-20: Vacuum Toilet Blockage Clearance", text: "Clearing a blockage in the aircraft vacuum toilet waste lines.", ans: "Waterproof long gloves (防水長手套), Face shield (防護面罩), Disposable coveralls (拋棄式防護衣)." }
+        ];
+
+        let ppeList = [];
+        let woList = [];
+        let currentTab = 'page-ppe';
+        let currentPhotoData = null; // Base64 holder
+        let currentFitMode = 'contain'; // 'contain' | 'cover' | 'custom'
+        let synth = window.speechSynthesis;
+        let voices = [];
+
+        /**
+         * Canvas Image Compression Helper (Keeps Base64 sizes compact for localStorage)
+         */
+        function compressImage(file, maxWidth = 500, maxHeight = 500, quality = 0.75) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > maxWidth) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            }
+                        } else {
+                            if (height > maxHeight) {
+                                width = Math.round((width * maxHeight) / height);
+                                height = maxHeight;
+                            }
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = "#0F172A"; // Dark background
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressedDataUrl);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function initData() {
+            const storedPPE = localStorage.getItem('aircraft_ppe_data_v3');
+            const storedWO = localStorage.getItem('aircraft_wo_data_v3');
+
+            if (storedPPE) {
+                try {
+                    ppeList = JSON.parse(storedPPE);
+                } catch(e) {
+                    ppeList = [...DEFAULT_PPE];
+                }
+            } else {
+                ppeList = [...DEFAULT_PPE];
+                savePPEToStorage();
+            }
+
+            if (storedWO) {
+                try {
+                    woList = JSON.parse(storedWO);
+                } catch(e) {
+                    woList = [...DEFAULT_WO];
+                }
+            } else {
+                woList = [...DEFAULT_WO];
+                saveWOToStorage();
+            }
+        }
+
+        function savePPEToStorage() {
+            try {
+                localStorage.setItem('aircraft_ppe_data_v3', JSON.stringify(ppeList));
+            } catch (err) {
+                showToast('儲存容量已滿，請更換較小之圖片檔案！', '⚠️');
+            }
+        }
+
+        function saveWOToStorage() {
+            localStorage.setItem('aircraft_wo_data_v3', JSON.stringify(woList));
+        }
+
+        function loadVoices() {
+            if (!synth) return;
+            voices = synth.getVoices();
+            const voiceSelect = document.getElementById('voice-select');
+            voiceSelect.innerHTML = '';
+
+            let enVoices = voices.filter(v => v.lang.startsWith('en'));
+            if (enVoices.length === 0) enVoices = voices;
+
+            enVoices.sort((a, b) => {
+                const keywords = ['natural', 'google', 'microsoft', 'premium', 'enhanced'];
+                let scoreA = keywords.reduce((acc, k) => acc + (a.name.toLowerCase().includes(k) ? 1 : 0), 0);
+                let scoreB = keywords.reduce((acc, k) => acc + (b.name.toLowerCase().includes(k) ? 1 : 0), 0);
+                return scoreB - scoreA;
+            });
+
+            enVoices.forEach(voice => {
+                const option = document.createElement('option');
+                option.textContent = `${voice.name} (${voice.lang})`;
+                option.value = voice.name;
+                voiceSelect.appendChild(option);
+            });
+        }
+
+        if (synth && 'onvoiceschanged' in synth) {
+            synth.onvoiceschanged = loadVoices;
+        }
+        setTimeout(loadVoices, 500);
+
+        function playAudio(textToSpeak) {
+            if (!synth) {
+                showToast('您的瀏覽器不支援 Web Speech 語音功能', '⚠️');
+                return;
+            }
+            synth.cancel();
+            const speech = new SpeechSynthesisUtterance(textToSpeak);
+            const selectedVoiceName = document.getElementById('voice-select').value;
+            const selectedVoice = voices.find(v => v.name === selectedVoiceName);
+            if (selectedVoice) speech.voice = selectedVoice;
+            speech.rate = 0.88;
+            speech.pitch = 1.0;
+            synth.speak(speech);
+            showToast('🔊 播放語音中...', '🔊');
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.getElementById('page-ppe').classList.add('hidden');
+            document.getElementById('page-wo').classList.add('hidden');
+            
+            const btnPpe = document.getElementById('btn-ppe');
+            const btnWo = document.getElementById('btn-wo');
+            const addBtnLabel = document.getElementById('add-btn-label');
+
+            btnPpe.className = "flex-1 lg:flex-none px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900";
+            btnWo.className = "flex-1 lg:flex-none px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900";
+
+            if (tabId === 'page-ppe') {
+                document.getElementById('page-ppe').classList.remove('hidden');
+                btnPpe.className = "flex-1 lg:flex-none px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-navy-800 text-white shadow-md";
+                addBtnLabel.textContent = "新增 PPE 裝備";
+            } else {
+                document.getElementById('page-wo').classList.remove('hidden');
+                btnWo.className = "flex-1 lg:flex-none px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-navy-800 text-white shadow-md";
+                addBtnLabel.textContent = "新增維修工單";
+            }
+            handleSearch();
+        }
+
+        function renderPPE(items = ppeList) {
+            const container = document.getElementById('ppe-container');
+            const emptyState = document.getElementById('ppe-empty-state');
+            document.getElementById('count-ppe').textContent = ppeList.length;
+
+            container.innerHTML = '';
+            if (items.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            items.forEach(item => {
+                let imageContentHtml = '';
+                const fitMode = item.fitMode || 'contain';
+
+                if (item.iconType === 'photo' && item.photoData) {
+                    if (fitMode === 'contain') {
+                        imageContentHtml = `
+                            <img src="${item.photoData}" alt="${escapeHtml(item.name)}" 
+                                 class="w-full h-full object-contain p-2 transition-all duration-200">
+                        `;
+                    } else if (fitMode === 'cover') {
+                        imageContentHtml = `
+                            <img src="${item.photoData}" alt="${escapeHtml(item.name)}" 
+                                 class="w-full h-full object-cover transition-all duration-200">
+                        `;
+                    } else {
+                        // Custom Zoom & Position
+                        const scale = item.photoScale || 100;
+                        const offsetX = item.photoOffsetX || 0;
+                        const offsetY = item.photoOffsetY || 0;
+                        imageContentHtml = `
+                            <div class="w-full h-full relative overflow-hidden flex items-center justify-center bg-slate-900">
+                                <img src="${item.photoData}" alt="${escapeHtml(item.name)}" 
+                                     class="absolute max-w-none max-h-none transition-transform duration-200"
+                                     style="transform: translate(${offsetX}px, ${offsetY}px) scale(${scale / 100}); transform-origin: center center; width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        `;
+                    }
+                } else {
+                    const iconSvg = svgLibrary[item.icon] || svgLibrary.tools;
+                    imageContentHtml = iconSvg;
+                }
+
+                const purposeEn = item.purposeEn || item.purpose || '';
+                const purposeZh = item.purposeZh || item.purpose || '';
+                const scenarioEn = item.scenarioEn || item.scenario || '';
+                const scenarioZh = item.scenarioZh || item.scenario || '';
+
+                const card = document.createElement('div');
+                card.className = "ppe-card bg-white rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-sky-600 hover:shadow-lg transition-all duration-200 flex flex-col justify-between overflow-hidden";
+                card.innerHTML = `
+                    <div>
+                        <!-- Strict Fixed Height Frame (180px / h-44) -->
+                        <div class="h-44 bg-slate-900 border-b border-slate-200 flex items-center justify-center overflow-hidden relative shadow-inner">
+                            ${imageContentHtml}
+                        </div>
+                        <div class="p-5">
+                            <!-- Title & Name Audio Button -->
+                            <div class="flex justify-between items-start gap-2 mb-3">
+                                <h3 class="font-bold text-slate-900 text-base leading-snug">${escapeHtml(item.name)}</h3>
+                                <button onclick="playAudio('${escapeJsStr(item.name)}')" class="p-2 bg-sky-50 text-sky-600 rounded-full hover:bg-sky-600 hover:text-white transition-all flex-shrink-0" title="朗讀英文名稱 (Pronounce Name)">
+                                    🔊
+                                </button>
+                            </div>
+                            
+                            <!-- Purpose Section -->
+                            <div class="mb-3 space-y-1.5 bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs sm:text-sm">
+                                <div class="flex justify-between items-center border-b border-slate-200/60 pb-1.5">
+                                    <span class="text-[11px] font-bold uppercase tracking-wider text-sky-700 flex items-center gap-1">🛡️ Purpose / 功能用途</span>
+                                    <button onclick="playAudio('${escapeJsStr(purposeEn)}')" class="px-2 py-0.5 bg-sky-100 hover:bg-sky-600 text-sky-700 hover:text-white text-[11px] font-semibold rounded transition-all flex items-center gap-1 shadow-xs" title="朗讀用途英文說明 (Listen Purpose)">
+                                        🔊 聽用途
+                                    </button>
+                                </div>
+                                <p class="text-slate-700 leading-relaxed"><span class="bg-sky-100 text-sky-800 font-bold px-1.5 py-0.5 rounded text-[10px] mr-1">EN</span>${escapeHtml(purposeEn)}</p>
+                                <p class="text-slate-600 leading-relaxed"><span class="bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded text-[10px] mr-1">繁中</span>${escapeHtml(purposeZh)}</p>
+                            </div>
+
+                            <!-- Scenario Section -->
+                            <div class="space-y-1.5 bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs sm:text-sm">
+                                <div class="flex justify-between items-center border-b border-slate-200/60 pb-1.5">
+                                    <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1">🔧 Scenario / 實務應用場景</span>
+                                    <button onclick="playAudio('${escapeJsStr(scenarioEn)}')" class="px-2 py-0.5 bg-emerald-100 hover:bg-emerald-600 text-emerald-700 hover:text-white text-[11px] font-semibold rounded transition-all flex items-center gap-1 shadow-xs" title="朗讀應用場景英文說明 (Listen Scenario)">
+                                        🔊 聽場景
+                                    </button>
+                                </div>
+                                <p class="text-slate-700 leading-relaxed"><span class="bg-sky-100 text-sky-800 font-bold px-1.5 py-0.5 rounded text-[10px] mr-1">EN</span>${escapeHtml(scenarioEn)}</p>
+                                <p class="text-slate-600 leading-relaxed"><span class="bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded text-[10px] mr-1">繁中</span>${escapeHtml(scenarioZh)}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+                        <button onclick="openPPEModal('${item.id}')" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-1">
+                            ✏️ 編輯
+                        </button>
+                        <button onclick="promptDeletePPE('${item.id}')" class="px-3 py-1.5 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-1">
+                            🗑 刪除
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderWO(items = woList) {
+            const container = document.getElementById('wo-container');
+            const emptyState = document.getElementById('wo-empty-state');
+            document.getElementById('count-wo').textContent = woList.length;
+
+            container.innerHTML = '';
+            if (items.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            items.forEach(wo => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 border-l-8 border-l-navy-800 p-6 hover:shadow-md transition-all";
+                card.innerHTML = `
+                    <div class="flex flex-wrap justify-between items-center gap-3 border-b border-slate-100 pb-3 mb-4">
+                        <span class="bg-navy-800/10 text-navy-800 font-bold px-3 py-1 rounded-full text-xs tracking-wider">${escapeHtml(wo.title)}</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="playAudio('${escapeJsStr(wo.text)}')" class="px-3 py-1.5 bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white rounded-lg text-xs font-semibold transition-all flex items-center gap-1">
+                                🔊 聽題目 (Listen Task)
+                            </button>
+                            <button onclick="openWOModal('${wo.id}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-all">✏️ 編輯</button>
+                            <button onclick="promptDeleteWO('${wo.id}')" class="px-3 py-1.5 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white rounded-lg text-xs font-semibold transition-all">🗑️ 刪除</button>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-4 mb-4 border border-slate-200 text-slate-800 font-medium text-base">
+                        ${escapeHtml(wo.text)}
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="toggleAnswerBox('${wo.id}')" id="ans-btn-${wo.id}" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-semibold transition-all">
+                            顯示答案 (Show Answer)
+                        </button>
+                        <div id="ans-box-${wo.id}" class="hidden mt-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 text-sm">
+                            <strong class="text-emerald-700 block font-bold mb-1">必備專業防護裝備 (Required PPE):</strong>
+                            ${escapeHtml(wo.ans)}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleAnswerBox(id) {
+            const box = document.getElementById(`ans-box-${id}`);
+            const btn = document.getElementById(`ans-btn-${id}`);
+            if (box.classList.contains('hidden')) {
+                box.classList.remove('hidden');
+                btn.textContent = '隱藏答案 (Hide Answer)';
+                btn.className = "px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold transition-all";
+            } else {
+                box.classList.add('hidden');
+                btn.textContent = '顯示答案 (Show Answer)';
+                btn.className = "px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-semibold transition-all";
+            }
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            if (currentTab === 'page-ppe') {
+                const filtered = ppeList.filter(item => 
+                    item.name.toLowerCase().includes(query) ||
+                    (item.purposeEn && item.purposeEn.toLowerCase().includes(query)) ||
+                    (item.purposeZh && item.purposeZh.toLowerCase().includes(query)) ||
+                    (item.scenarioEn && item.scenarioEn.toLowerCase().includes(query)) ||
+                    (item.scenarioZh && item.scenarioZh.toLowerCase().includes(query))
+                );
+                renderPPE(filtered);
+            } else {
+                const filtered = woList.filter(wo => 
+                    wo.title.toLowerCase().includes(query) ||
+                    wo.text.toLowerCase().includes(query) ||
+                    wo.ans.toLowerCase().includes(query)
+                );
+                renderWO(filtered);
+            }
+        }
+
+        function handleOpenAddModal() {
+            if (currentTab === 'page-ppe') {
+                openPPEModal();
+            } else {
+                openWOModal();
+            }
+        }
+
+        function toggleImageTypeUI() {
+            const isPhoto = document.getElementById('img-type-photo').checked;
+            const iconContainer = document.getElementById('icon-select-container');
+            const photoContainer = document.getElementById('photo-upload-container');
+
+            if (isPhoto) {
+                iconContainer.classList.add('hidden');
+                photoContainer.classList.remove('hidden');
+            } else {
+                iconContainer.classList.remove('hidden');
+                photoContainer.classList.add('hidden');
+            }
+            updateImagePreview();
+        }
+
+        function setFitMode(mode) {
+            currentFitMode = mode;
+            const btnContain = document.getElementById('fit-btn-contain');
+            const btnCover = document.getElementById('fit-btn-cover');
+            const btnCustom = document.getElementById('fit-btn-custom');
+            const customSliderBox = document.getElementById('custom-slider-box');
+
+            // Reset UI states
+            btnContain.className = "py-1.5 px-2 rounded-lg border border-slate-300 bg-white text-slate-700 font-semibold text-xs transition-all text-center";
+            btnCover.className = "py-1.5 px-2 rounded-lg border border-slate-300 bg-white text-slate-700 font-semibold text-xs transition-all text-center";
+            btnCustom.className = "py-1.5 px-2 rounded-lg border border-slate-300 bg-white text-slate-700 font-semibold text-xs transition-all text-center";
+
+            if (mode === 'contain') {
+                btnContain.className = "py-1.5 px-2 rounded-lg border border-sky-600 bg-sky-50 text-sky-800 font-bold text-xs transition-all text-center";
+                customSliderBox.classList.add('hidden');
+            } else if (mode === 'cover') {
+                btnCover.className = "py-1.5 px-2 rounded-lg border border-sky-600 bg-sky-50 text-sky-800 font-bold text-xs transition-all text-center";
+                customSliderBox.classList.add('hidden');
+            } else if (mode === 'custom') {
+                btnCustom.className = "py-1.5 px-2 rounded-lg border border-sky-600 bg-sky-50 text-sky-800 font-bold text-xs transition-all text-center";
+                customSliderBox.classList.remove('hidden');
+            }
+
+            updateImagePreview();
+        }
+
+        function resetPhotoFrameControls() {
+            document.getElementById('ppe-form-scale').value = 100;
+            document.getElementById('ppe-form-offset-x').value = 0;
+            document.getElementById('ppe-form-offset-y').value = 0;
+            setFitMode('contain');
+        }
+
+        function updateImagePreview() {
+            const isPhoto = document.getElementById('img-type-photo').checked;
+            const previewBox = document.getElementById('image-preview-box');
+
+            if (isPhoto) {
+                if (!currentPhotoData) {
+                    previewBox.innerHTML = `<span class="text-xs text-slate-400">尚無選擇照片 (請點選上方上傳檔案)</span>`;
+                    return;
+                }
+
+                if (currentFitMode === 'contain') {
+                    previewBox.innerHTML = `
+                        <img src="${currentPhotoData}" class="w-full h-full object-contain p-2 transition-all">
+                    `;
+                } else if (currentFitMode === 'cover') {
+                    previewBox.innerHTML = `
+                        <img src="${currentPhotoData}" class="w-full h-full object-cover transition-all">
+                    `;
+                } else {
+                    const scale = document.getElementById('ppe-form-scale').value || 100;
+                    const offsetX = document.getElementById('ppe-form-offset-x').value || 0;
+                    const offsetY = document.getElementById('ppe-form-offset-y').value || 0;
+
+                    document.getElementById('scale-val').textContent = `${scale}%`;
+                    document.getElementById('offset-x-val').textContent = `${offsetX}px`;
+                    document.getElementById('offset-y-val').textContent = `${offsetY}px`;
+
+                    previewBox.innerHTML = `
+                        <div class="w-full h-full relative overflow-hidden flex items-center justify-center bg-slate-900">
+                            <img src="${currentPhotoData}" class="absolute max-w-none max-h-none transition-transform duration-75"
+                                 style="transform: translate(${offsetX}px, ${offsetY}px) scale(${scale / 100}); transform-origin: center center; width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    `;
+                }
+            } else {
+                const selectedIconKey = document.getElementById('ppe-form-icon').value;
+                const iconSvg = svgLibrary[selectedIconKey] || svgLibrary.tools;
+                previewBox.innerHTML = iconSvg;
+            }
+        }
+
+        async function handleImageFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showToast('請上傳有效的圖片檔案 (JPG, PNG)', '⚠️');
+                return;
+            }
+
+            try {
+                showToast('正在優化壓縮照片中...', '⏳');
+                currentPhotoData = await compressImage(file, 500, 500, 0.75);
+                updateImagePreview();
+                showToast('照片上傳並壓縮成功！', '📸');
+            } catch (err) {
+                showToast('照片處理失敗，請試試其他圖片', '⚠️');
+            }
+        }
+
+        function openPPEModal(id = null) {
+            const modal = document.getElementById('ppe-modal');
+            const title = document.getElementById('ppe-modal-title');
+            const fileInput = document.getElementById('ppe-form-file');
+            fileInput.value = '';
+
+            if (id) {
+                const item = ppeList.find(x => x.id === id);
+                if (!item) return;
+                title.innerHTML = '<span>✏️</span> 編輯 PPE 個人防護裝備';
+                document.getElementById('ppe-form-id').value = item.id;
+                document.getElementById('ppe-form-name').value = item.name;
+                document.getElementById('ppe-form-purpose-en').value = item.purposeEn || item.purpose || '';
+                document.getElementById('ppe-form-purpose-zh').value = item.purposeZh || item.purpose || '';
+                document.getElementById('ppe-form-scenario-en').value = item.scenarioEn || item.scenario || '';
+                document.getElementById('ppe-form-scenario-zh').value = item.scenarioZh || item.scenario || '';
+
+                document.getElementById('ppe-form-scale').value = item.photoScale || 100;
+                document.getElementById('ppe-form-offset-x').value = item.photoOffsetX || 0;
+                document.getElementById('ppe-form-offset-y').value = item.photoOffsetY || 0;
+
+                if (item.iconType === 'photo' && item.photoData) {
+                    document.getElementById('img-type-photo').checked = true;
+                    currentPhotoData = item.photoData;
+                    setFitMode(item.fitMode || 'contain');
+                } else {
+                    document.getElementById('img-type-icon').checked = true;
+                    document.getElementById('ppe-form-icon').value = item.icon || 'tools';
+                    currentPhotoData = null;
+                    setFitMode('contain');
+                }
+            } else {
+                title.innerHTML = '<span>➕</span> 新增 PPE 個人防護裝備';
+                document.getElementById('ppe-form').reset();
+                document.getElementById('ppe-form-id').value = '';
+                document.getElementById('img-type-icon').checked = true;
+                currentPhotoData = null;
+                resetPhotoFrameControls();
+            }
+
+            toggleImageTypeUI();
+            modal.classList.remove('hidden');
+        }
+
+        function closePPEModal() {
+            document.getElementById('ppe-modal').classList.add('hidden');
+        }
+
+        function savePPEForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('ppe-form-id').value;
+            const name = document.getElementById('ppe-form-name').value.trim();
+            const purposeEn = document.getElementById('ppe-form-purpose-en').value.trim();
+            const purposeZh = document.getElementById('ppe-form-purpose-zh').value.trim();
+            const scenarioEn = document.getElementById('ppe-form-scenario-en').value.trim();
+            const scenarioZh = document.getElementById('ppe-form-scenario-zh').value.trim();
+            const isPhoto = document.getElementById('img-type-photo').checked;
+
+            let iconType = 'icon';
+            let icon = 'tools';
+            let photoData = null;
+
+            const photoScale = parseInt(document.getElementById('ppe-form-scale').value) || 100;
+            const photoOffsetX = parseInt(document.getElementById('ppe-form-offset-x').value) || 0;
+            const photoOffsetY = parseInt(document.getElementById('ppe-form-offset-y').value) || 0;
+
+            if (isPhoto) {
+                if (!currentPhotoData) {
+                    showToast('請先選擇並上傳裝備照片！', '⚠️');
+                    return;
+                }
+                iconType = 'photo';
+                photoData = currentPhotoData;
+            } else {
+                iconType = 'icon';
+                icon = document.getElementById('ppe-form-icon').value;
+            }
+
+            const payload = { 
+                id, 
+                name, 
+                purposeEn, 
+                purposeZh, 
+                scenarioEn, 
+                scenarioZh, 
+                iconType, 
+                icon, 
+                photoData, 
+                fitMode: currentFitMode,
+                photoScale, 
+                photoOffsetX, 
+                photoOffsetY 
+            };
+
+            if (id) {
+                const index = ppeList.findIndex(x => x.id === id);
+                if (index !== -1) {
+                    ppeList[index] = payload;
+                    showToast('PPE 裝備與圖片設定更新成功！', '✅');
+                }
+            } else {
+                payload.id = 'ppe_' + Date.now();
+                ppeList.unshift(payload);
+                showToast('已新增全新的 PPE 裝備！', '🎉');
+            }
+
+            savePPEToStorage();
+            closePPEModal();
+            handleSearch();
+        }
+
+        function promptDeletePPE(id) {
+            const item = ppeList.find(x => x.id === id);
+            if (!item) return;
+
+            openConfirmModal({
+                title: `確定要刪除「${item.name}」？`,
+                msg: '刪除後裝備資料將無法還原，確定繼續？',
+                onConfirm: () => {
+                    ppeList = ppeList.filter(x => x.id !== id);
+                    savePPEToStorage();
+                    handleSearch();
+                    showToast('已成功刪除 PPE 裝備', '🗑️');
+                }
+            });
+        }
+
+        function openWOModal(id = null) {
+            const modal = document.getElementById('wo-modal');
+            const title = document.getElementById('wo-modal-title');
+
+            if (id) {
+                const wo = woList.find(x => x.id === id);
+                if (!wo) return;
+                title.innerHTML = '<span>✏️</span> 編輯維修工單任務';
+                document.getElementById('wo-form-id').value = wo.id;
+                document.getElementById('wo-form-title').value = wo.title;
+                document.getElementById('wo-form-text').value = wo.text;
+                document.getElementById('wo-form-ans').value = wo.ans;
+            } else {
+                title.innerHTML = '<span>➕</span> 新增維修工單任務';
+                document.getElementById('wo-form').reset();
+                document.getElementById('wo-form-id').value = '';
+                document.getElementById('wo-form-title').value = `WO-${woList.length + 1}: New Task`;
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeWOModal() {
+            document.getElementById('wo-modal').classList.add('hidden');
+        }
+
+        function saveWOForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('wo-form-id').value;
+            const title = document.getElementById('wo-form-title').value.trim();
+            const text = document.getElementById('wo-form-text').value.trim();
+            const ans = document.getElementById('wo-form-ans').value.trim();
+
+            if (id) {
+                const index = woList.findIndex(x => x.id === id);
+                if (index !== -1) {
+                    woList[index] = { id, title, text, ans };
+                    showToast('維修工單更新成功！', '✅');
+                }
+            } else {
+                const newId = 'wo_' + Date.now();
+                woList.unshift({ id: newId, title, text, ans });
+                showToast('已新增全新維修工單！', '🎉');
+            }
+
+            saveWOToStorage();
+            closeWOModal();
+            handleSearch();
+        }
+
+        function promptDeleteWO(id) {
+            const wo = woList.find(x => x.id === id);
+            if (!wo) return;
+
+            openConfirmModal({
+                title: `確定刪除工單「${wo.title}」？`,
+                msg: '刪除後該工單題目將移除，確定繼續？',
+                onConfirm: () => {
+                    woList = woList.filter(x => x.id !== id);
+                    saveWOToStorage();
+                    handleSearch();
+                    showToast('已刪除該維修工單', '🗑️');
+                }
+            });
+        }
+
+        function promptResetDefaults() {
+            openConfirmModal({
+                title: '重設所有資料為預設值？',
+                msg: '此操作將還原所有原始 32 種雙語 PPE 裝備與 20 套維修工單，您自行新增或修改的內容將被覆蓋！',
+                onConfirm: () => {
+                    ppeList = [...DEFAULT_PPE];
+                    woList = [...DEFAULT_WO];
+                    savePPEToStorage();
+                    saveWOToStorage();
+                    handleSearch();
+                    showToast('已恢復原廠預設 32 項雙語 PPE 與 20 項工單', '🔄');
+                }
+            });
+        }
+
+        // Confirm Dialog Helper
+        let pendingConfirmAction = null;
+
+        function openConfirmModal({ title, msg, onConfirm }) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-msg').textContent = msg;
+            pendingConfirmAction = onConfirm;
+            
+            const actionBtn = document.getElementById('confirm-action-btn');
+            actionBtn.onclick = () => {
+                if (pendingConfirmAction) pendingConfirmAction();
+                closeConfirmModal();
+            };
+            
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+            pendingConfirmAction = null;
+        }
+
+        // Toast Helper
+        function showToast(msg, icon = '✨') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            document.getElementById('toast-icon').textContent = icon;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Utility Helpers
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function escapeJsStr(str) {
+            if (!str) return '';
+            return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+        }
+
+        document.getElementById('ppe-form-icon').addEventListener('change', updateImagePreview);
+
+        window.onload = function() {
+            initData();
+            renderPPE();
+            renderWO();
+        };
+    </script>
+</body>
+</html>
